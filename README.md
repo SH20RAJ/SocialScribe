@@ -19,6 +19,10 @@
 - **Language Support**: Write posts in different languages to cater to a global audience. 🌍
 - **Keywords**: Optimize content with user-specified keywords for SEO. 🔑💡
 - **Contextual Feedback**: If the options aren't exactly what you're looking for, provide feedback or write in the context directly! 📝💬
+- **Model Switching**: Choose between different AI models (Gemini, GPT) for content generation. 🔄 (may come soon)
+- **Text-to-Speech**: Convert your posts to audio for accessibility (may come soon). 🎧
+- **Multi-Account Management**: Manage multiple social media accounts from one place (may coming soon). 📱
+- **Chrome Extension**: Coming soon - Generate social media content right from your browser (may come soon)! 🧩
 
 ## How It Works 🔧
 
@@ -62,7 +66,7 @@ To get started with SocialScribe locally, follow these steps:
 
 ## Contributing 🤝
 
-We welcome contributions! If you'd like to contribute, fork the repository and submit a pull request. Here’s how:
+We welcome contributions! If you'd like to contribute, fork the repository and submit a pull request. Here's how:
 
 1. Fork the repository.
 2. Create a new branch (`git checkout -b feature/your-feature-name`).

@@ -14,6 +14,14 @@ export default function Footer() {
           >
             SH20RAJ
           </Link>
+          {" · "}
+          <Link
+            href="https://www.linkedin.com/in/sh20raj/"
+            target="_blank"
+            className="font-medium text-primary hover:underline"
+          >
+            LinkedIn
+          </Link>
         </p>
       </div>
     </footer>

@@ -32,6 +32,7 @@ export async function POST(request) {
       Tone: ${tone}
       Length: ${length}
       Sentiment: ${sentiment}% positive
+      the text must be attractive and engaging
       ${useEmojis ? 'Include relevant emojis' : 'No emojis'}
       ${useHashtags ? 'Include relevant hashtags' : 'No hashtags'}
       ${useCTA ? 'Include a call to action' : 'No call to action'}
