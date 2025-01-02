@@ -36,90 +36,57 @@ import {
 } from "lucide-react";
 
 export default function Menubar() {
-  const [contentType, setContentType] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).contentType || "" : "";
-  });
-
-  const [platform, setPlatform] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).platform || "" : "";
-  });
-
-  const [tone, setTone] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).tone || "" : "";
-  });
-
-  const [length, setLength] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).length || "" : "";
-  });
-
-  const [useEmojis, setUseEmojis] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).useEmojis || false : false;
-  });
-
-  const [useHashtags, setUseHashtags] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).useHashtags || false : false;
-  });
-
-  const [useCTA, setUseCTA] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).useCTA || false : false;
-  });
-
-  const [sentiment, setSentiment] = useState(() => {
-    const saved = localStorage.getItem("userPreferences");
-    return saved ? JSON.parse(saved).sentiment || 50 : 50;
-  });
-
+  // Initial state values without localStorage
+  const [contentType, setContentType] = useState("");
+  const [platform, setPlatform] = useState("");
+  const [tone, setTone] = useState("");
+  const [length, setLength] = useState("");
+  const [useEmojis, setUseEmojis] = useState(false);
+  const [useHashtags, setUseHashtags] = useState(false);
+  const [useCTA, setUseCTA] = useState(false);
+  const [sentiment, setSentiment] = useState(50);
   const [context, setContext] = useState("");
   const [loading, setLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const [copied, setCopied] = useState(false);
 
+  // Load preferences on component mount
   useEffect(() => {
-    // Load saved preferences
-    const savedPrefs = localStorage.getItem("userPreferences");
-    if (savedPrefs) {
-      const prefs = JSON.parse(savedPrefs);
-      setContentType(prefs.contentType || "");
-      setPlatform(prefs.platform || "");
-      setTone(prefs.tone || "");
-      setLength(prefs.length || "");
-      setUseEmojis(prefs.useEmojis || false);
-      setUseHashtags(prefs.useHashtags || false);
-      setUseCTA(prefs.useCTA || false);
-      setSentiment(prefs.sentiment || 50);
-    }
+    const loadPreferences = () => {
+      if (typeof window !== 'undefined') {
+        const savedPrefs = localStorage.getItem("userPreferences");
+        if (savedPrefs) {
+          const prefs = JSON.parse(savedPrefs);
+          setContentType(prefs?.contentType || "");
+          setPlatform(prefs?.platform || "");
+          setTone(prefs?.tone || "");
+          setLength(prefs?.length || "");
+          setUseEmojis(prefs?.useEmojis || false);
+          setUseHashtags(prefs?.useHashtags || false);
+          setUseCTA(prefs?.useCTA || false);
+          setSentiment(prefs?.sentiment || 50);
+        }
+      }
+    };
+    loadPreferences();
   }, []);
 
-  // Save preferences whenever they change
+  // Save preferences
   useEffect(() => {
-    const preferences = {
-      contentType,
-      platform,
-      tone,
-      length,
-      useEmojis,
-      useHashtags,
-      useCTA,
-      sentiment,
-    };
-    localStorage.setItem("userPreferences", JSON.stringify(preferences));
-  }, [
-    contentType,
-    platform,
-    tone,
-    length,
-    useEmojis,
-    useHashtags,
-    useCTA,
-    sentiment,
-  ]);
+    if (typeof window !== 'undefined') {
+      const preferences = {
+        contentType,
+        platform,
+        tone,
+        length,
+        useEmojis,
+        useHashtags,
+        useCTA,
+        sentiment,
+      };
+      localStorage.setItem("userPreferences", JSON.stringify(preferences));
+    }
+  }, [contentType, platform, tone, length, useEmojis, useHashtags, useCTA, sentiment]);
 
   const handleGenerate = async () => {
     try {

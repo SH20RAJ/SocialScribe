@@ -11,10 +11,16 @@ export default function Home() {
 
         <div className="flex gap-4 mt-8">
           <Link href={"/#PlannedPhase"}>
-            <Button> <Chrome className="mr-2"/> Chrome Extension</Button>
+            <Button>
+              {" "}
+              <Chrome className="mr-2" /> Chrome Extension
+            </Button>
           </Link>
           <Link href={"/about"}>
-            <Button> <RabbitIcon className="mr-2"/> About</Button>
+            <Button>
+              {" "}
+              <RabbitIcon className="mr-2" /> About
+            </Button>
           </Link>
         </div>
       </main>
