@@ -1,39 +1,133 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
+  ScrollArea,
+  ScrollAreaContent,
+  ScrollAreaScrollbar,
+  ScrollAreaThumb,
+  ScrollAreaViewport,
 } from "@/components/ui/select";
 import { Toggle } from "@/components/ui/toggle";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Copy, Check } from "lucide-react";
+import {
+  Linkedin,
+  Twitter,
+  Facebook,
+  FileText,
+  MessageCircle,
+  Send,
+  Briefcase,
+  Coffee,
+  Heart,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Smile,
+  Hash,
+  BellRing,
+} from "lucide-react";
 
 export default function Menubar() {
-  const [contentType, setContentType] = useState("");
-  const [platform, setPlatform] = useState("");
+  const [contentType, setContentType] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).contentType || "" : "";
+  });
+
+  const [platform, setPlatform] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).platform || "" : "";
+  });
+
+  const [tone, setTone] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).tone || "" : "";
+  });
+
+  const [length, setLength] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).length || "" : "";
+  });
+
+  const [useEmojis, setUseEmojis] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).useEmojis || false : false;
+  });
+
+  const [useHashtags, setUseHashtags] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).useHashtags || false : false;
+  });
+
+  const [useCTA, setUseCTA] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).useCTA || false : false;
+  });
+
+  const [sentiment, setSentiment] = useState(() => {
+    const saved = localStorage.getItem("userPreferences");
+    return saved ? JSON.parse(saved).sentiment || 50 : 50;
+  });
+
   const [context, setContext] = useState("");
-  const [tone, setTone] = useState("");
-  const [length, setLength] = useState("");
-  const [useEmojis, setUseEmojis] = useState(false);
-  const [useHashtags, setUseHashtags] = useState(false);
-  const [useCTA, setUseCTA] = useState(false);
-  const [sentiment, setSentiment] = useState(50);
   const [loading, setLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    // Load saved preferences
+    const savedPrefs = localStorage.getItem("userPreferences");
+    if (savedPrefs) {
+      const prefs = JSON.parse(savedPrefs);
+      setContentType(prefs.contentType || "");
+      setPlatform(prefs.platform || "");
+      setTone(prefs.tone || "");
+      setLength(prefs.length || "");
+      setUseEmojis(prefs.useEmojis || false);
+      setUseHashtags(prefs.useHashtags || false);
+      setUseCTA(prefs.useCTA || false);
+      setSentiment(prefs.sentiment || 50);
+    }
+  }, []);
+
+  // Save preferences whenever they change
+  useEffect(() => {
+    const preferences = {
+      contentType,
+      platform,
+      tone,
+      length,
+      useEmojis,
+      useHashtags,
+      useCTA,
+      sentiment,
+    };
+    localStorage.setItem("userPreferences", JSON.stringify(preferences));
+  }, [
+    contentType,
+    platform,
+    tone,
+    length,
+    useEmojis,
+    useHashtags,
+    useCTA,
+    sentiment,
+  ]);
+
   const handleGenerate = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/generate', {
-        method: 'POST',
+      const response = await fetch("/api/generate", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           contentType,
@@ -44,7 +138,7 @@ export default function Menubar() {
           useEmojis,
           useHashtags,
           useCTA,
-          sentiment
+          sentiment,
         }),
       });
 
@@ -52,7 +146,7 @@ export default function Menubar() {
       if (data.error) throw new Error(data.error);
       setGeneratedContent(data.content);
     } catch (error) {
-      console.error('Generation failed:', error);
+      console.error("Generation failed:", error);
     } finally {
       setLoading(false);
     }
@@ -68,25 +162,55 @@ export default function Menubar() {
     <div className="flex flex-col w-full md:max-w-5xl space-y-6 p-4 border rounded-lg bg-card">
       {/* Content Type and Platform Selection */}
       <div className="flex items-center space-x-4">
-        <Select onValueChange={setContentType}>
+        <Select defaultValue={contentType} onValueChange={setContentType}>
           <SelectTrigger>
             <SelectValue placeholder="Select Content Type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="post">Post 📝</SelectItem>
-            <SelectItem value="comment">Comment 💬</SelectItem>
-            <SelectItem value="dm">Direct Message 📩</SelectItem>
+            <SelectItem value="post">
+              <div className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span>Post</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="comment">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Comment</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="dm">
+              <div className="flex items-center gap-2">
+                <Send className="h-4 w-4" />
+                <span>Direct Message</span>
+              </div>
+            </SelectItem>
           </SelectContent>
         </Select>
 
-        <Select onValueChange={setPlatform}>
+        <Select defaultValue={platform} onValueChange={setPlatform}>
           <SelectTrigger>
             <SelectValue placeholder="Select Platform" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="linkedin">LinkedIn</SelectItem>
-            <SelectItem value="twitter">Twitter</SelectItem>
-            <SelectItem value="facebook">Facebook</SelectItem>
+            <SelectItem value="linkedin">
+              <div className="flex items-center gap-2">
+                <Linkedin className="h-4 w-4" />
+                <span>LinkedIn</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="twitter">
+              <div className="flex items-center gap-2">
+                <Twitter className="h-4 w-4" />
+                <span>Twitter</span>
+              </div>
+            </SelectItem>
+            <SelectItem value="facebook">
+              <div className="flex items-center gap-2">
+                <Facebook className="h-4 w-4" />
+                <span>Facebook</span>
+              </div>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -102,27 +226,57 @@ export default function Menubar() {
       {/* Content Style Controls */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Select onValueChange={setTone}>
+          <Select defaultValue={tone} onValueChange={setTone}>
             <SelectTrigger>
               <SelectValue placeholder="Select Tone" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="official">Official 👔</SelectItem>
-              <SelectItem value="casual">Casual 😊</SelectItem>
-              <SelectItem value="flirty">Flirty 😘</SelectItem>
+              <SelectItem value="official">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  <span>Official</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="casual">
+                <div className="flex items-center gap-2">
+                  <Coffee className="h-4 w-4" />
+                  <span>Casual</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="flirty">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-4 w-4" />
+                  <span>Flirty</span>
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Select onValueChange={setLength}>
+          <Select defaultValue={length} onValueChange={setLength}>
             <SelectTrigger>
               <SelectValue placeholder="Content Length" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="short">Short 📏</SelectItem>
-              <SelectItem value="medium">Medium 📏📏</SelectItem>
-              <SelectItem value="long">Long 📏📏📏</SelectItem>
+              <SelectItem value="short">
+                <div className="flex items-center gap-2">
+                  <AlignLeft className="h-4 w-4" />
+                  <span>Short</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="medium">
+                <div className="flex items-center gap-2">
+                  <AlignCenter className="h-4 w-4" />
+                  <span>Medium</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="long">
+                <div className="flex items-center gap-2">
+                  <AlignRight className="h-4 w-4" />
+                  <span>Long</span>
+                </div>
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -130,23 +284,42 @@ export default function Menubar() {
 
       {/* Toggle Controls */}
       <div className="flex items-center justify-center space-x-4">
-        <Toggle aria-label="Toggle emojis" pressed={useEmojis} onPressedChange={setUseEmojis}>Emojis 😄</Toggle>
-        <Toggle aria-label="Toggle hashtags" pressed={useHashtags} onPressedChange={setUseHashtags}>Hashtags #️⃣</Toggle>
-        <Toggle aria-label="Toggle CTA" pressed={useCTA} onPressedChange={setUseCTA}>Call to Action 📢</Toggle>
+        <Toggle
+          aria-label="Toggle emojis"
+          defaultPressed={useEmojis}
+          onPressedChange={setUseEmojis}
+        >
+          <Smile className="h-4 w-4 mr-2" /> Emojis
+        </Toggle>
+        <Toggle
+          aria-label="Toggle hashtags"
+          defaultPressed={useHashtags}
+          onPressedChange={setUseHashtags}
+        >
+          <Hash className="h-4 w-4 mr-2" /> Hashtags
+        </Toggle>
+        <Toggle
+          aria-label="Toggle CTA"
+          defaultPressed={useCTA}
+          onPressedChange={setUseCTA}
+        >
+          <BellRing className="h-4 w-4 mr-2" /> Call to Action
+        </Toggle>
       </div>
 
       {/* Sentiment Slider */}
       <div className="space-y-2">
         <label>Sentiment Control</label>
-        <Slider value={[sentiment]} onValueChange={(value) => setSentiment(value[0])} max={100} step={1} />
+        <Slider
+          defaultValue={[sentiment]}
+          onValueChange={(value) => setSentiment(value[0])}
+          max={100}
+          step={1}
+        />
       </div>
 
       {/* Generate Button */}
-      <Button 
-        className="w-full" 
-        onClick={handleGenerate}
-        disabled={loading}
-      >
+      <Button className="w-full" onClick={handleGenerate} disabled={loading}>
         {loading ? "Generating..." : "Generate Content 🚀"}
       </Button>
 

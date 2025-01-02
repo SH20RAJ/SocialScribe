@@ -54,10 +54,11 @@ To get started with SocialScribe locally, follow these steps:
 ## Tech Stack 💻
 
 - **Frontend**: React.js / Next.js
-- **Backend**: Node.js
-- **AI Models**: OpenAI GPT for natural language generation
-- **Database**: MongoDB (if you plan to store user data)
-- **Authentication**: JWT or OAuth (for social media integrations)
+- **Backend**: Next.js
+- **AI Models**: Gemini 1.5 for natural language generation
+> # N/A
+> - **Database**: MongoDB (if you plan to store user data)
+> - **Authentication**: JWT or OAuth (for social media integrations)
 
 ## Contributing 🤝
 
