@@ -2,6 +2,9 @@
 
 **SocialScribe** is an AI-powered tool that helps you create tailored social media posts, comments, and direct messages (DMs) for platforms like LinkedIn, Twitter, Facebook, and more. You can easily write content by providing a context and selecting options such as tone, formality, and even whether you want it to be playful or professional! 😎
 
+[![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FSH20RAJ%2FSocialScribe&countColor=%23263759)](https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2FSH20RAJ%2FSocialScribe)
+
+
 ## Features 🌟
 
 - **Post Customization**: Select the tone (official, casual, playful, flirting, etc.) and other options for the post. 🎯
