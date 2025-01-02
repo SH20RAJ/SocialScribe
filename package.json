@@ -12,6 +12,7 @@
     "deploy": "npm run pages:build && wrangler pages deploy"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@hookform/resolvers": "^3.9.0",
     "@nextui-org/react": "^2.6.10",
     "@radix-ui/react-accordion": "^1.2.0",

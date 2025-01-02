@@ -14,16 +14,48 @@ import { Textarea } from "@/components/ui/textarea";
 import { Copy, Check } from "lucide-react";
 
 export default function Menubar() {
+  const [contentType, setContentType] = useState("");
+  const [platform, setPlatform] = useState("");
+  const [context, setContext] = useState("");
+  const [tone, setTone] = useState("");
+  const [length, setLength] = useState("");
+  const [useEmojis, setUseEmojis] = useState(false);
+  const [useHashtags, setUseHashtags] = useState(false);
+  const [useCTA, setUseCTA] = useState(false);
+  const [sentiment, setSentiment] = useState(50);
+  const [loading, setLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const handleGenerate = () => {
-    // Demo content - replace with actual API call
-    setGeneratedContent(
-      "🌟 Just launched an exciting new project! Check out SocialScribe - your AI-powered social media assistant! ✨\n\n" +
-        "It helps create engaging content with perfect tone and style for any platform. Try it now and level up your social game! 🚀\n\n" +
-        "#AI #SocialMedia #ContentCreation"
-    );
+  const handleGenerate = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contentType,
+          platform,
+          context,
+          tone,
+          length,
+          useEmojis,
+          useHashtags,
+          useCTA,
+          sentiment
+        }),
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+      setGeneratedContent(data.content);
+    } catch (error) {
+      console.error('Generation failed:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCopy = async () => {
@@ -36,7 +68,7 @@ export default function Menubar() {
     <div className="flex flex-col w-full md:max-w-5xl space-y-6 p-4 border rounded-lg bg-card">
       {/* Content Type and Platform Selection */}
       <div className="flex items-center space-x-4">
-        <Select>
+        <Select onValueChange={setContentType}>
           <SelectTrigger>
             <SelectValue placeholder="Select Content Type" />
           </SelectTrigger>
@@ -47,7 +79,7 @@ export default function Menubar() {
           </SelectContent>
         </Select>
 
-        <Select>
+        <Select onValueChange={setPlatform}>
           <SelectTrigger>
             <SelectValue placeholder="Select Platform" />
           </SelectTrigger>
@@ -61,6 +93,8 @@ export default function Menubar() {
 
       {/* Content Context */}
       <Textarea
+        value={context}
+        onChange={(e) => setContext(e.target.value)}
         placeholder="Enter your content context here..."
         className="min-h-[100px]"
       />
@@ -68,7 +102,7 @@ export default function Menubar() {
       {/* Content Style Controls */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Select>
+          <Select onValueChange={setTone}>
             <SelectTrigger>
               <SelectValue placeholder="Select Tone" />
             </SelectTrigger>
@@ -81,7 +115,7 @@ export default function Menubar() {
         </div>
 
         <div className="space-y-2">
-          <Select>
+          <Select onValueChange={setLength}>
             <SelectTrigger>
               <SelectValue placeholder="Content Length" />
             </SelectTrigger>
@@ -96,20 +130,24 @@ export default function Menubar() {
 
       {/* Toggle Controls */}
       <div className="flex items-center justify-center space-x-4">
-        <Toggle aria-label="Toggle emojis">Emojis 😄</Toggle>
-        <Toggle aria-label="Toggle hashtags">Hashtags #️⃣</Toggle>
-        <Toggle aria-label="Toggle CTA">Call to Action 📢</Toggle>
+        <Toggle aria-label="Toggle emojis" pressed={useEmojis} onPressedChange={setUseEmojis}>Emojis 😄</Toggle>
+        <Toggle aria-label="Toggle hashtags" pressed={useHashtags} onPressedChange={setUseHashtags}>Hashtags #️⃣</Toggle>
+        <Toggle aria-label="Toggle CTA" pressed={useCTA} onPressedChange={setUseCTA}>Call to Action 📢</Toggle>
       </div>
 
       {/* Sentiment Slider */}
       <div className="space-y-2">
         <label>Sentiment Control</label>
-        <Slider defaultValue={[50]} max={100} step={1} />
+        <Slider value={[sentiment]} onValueChange={(value) => setSentiment(value[0])} max={100} step={1} />
       </div>
 
       {/* Generate Button */}
-      <Button className="w-full" onClick={handleGenerate}>
-        Generate Content 🚀
+      <Button 
+        className="w-full" 
+        onClick={handleGenerate}
+        disabled={loading}
+      >
+        {loading ? "Generating..." : "Generate Content 🚀"}
       </Button>
 
       {/* Generated Content Display */}

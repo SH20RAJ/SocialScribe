@@ -12,7 +12,7 @@ export default function Footer() {
             target="_blank"
             className="font-medium text-primary hover:underline"
           >
-            SH20raj
+            SH20RAJ
           </Link>
         </p>
       </div>
