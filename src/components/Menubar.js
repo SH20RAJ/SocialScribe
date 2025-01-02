@@ -11,10 +11,11 @@ import { Toggle } from "@/components/ui/toggle";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Copy } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 export default function Menubar() {
   const [generatedContent, setGeneratedContent] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const handleGenerate = () => {
     // Demo content - replace with actual API call
@@ -23,6 +24,12 @@ export default function Menubar() {
         "It helps create engaging content with perfect tone and style for any platform. Try it now and level up your social game! 🚀\n\n" +
         "#AI #SocialMedia #ContentCreation"
     );
+  };
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generatedContent);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
@@ -112,11 +119,19 @@ export default function Menubar() {
             variant="ghost"
             size="sm"
             className="absolute top-2 right-2"
-            onClick={() => navigator.clipboard.writeText(generatedContent)}
+            onClick={handleCopy}
           >
-            <Copy className="h-4 w-4" />
+            {copied ? (
+              <Check className="h-4 w-4 text-green-500" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
           </Button>
-          <p className="whitespace-pre-wrap">{generatedContent}</p>
+          <Textarea
+            value={generatedContent}
+            onChange={(e) => setGeneratedContent(e.target.value)}
+            className="min-h-[150px] bg-transparent border-none focus-visible:ring-0"
+          />
         </div>
       )}
     </div>
