@@ -129,7 +129,7 @@ export default function Menubar() {
     <div className="flex flex-col w-full md:max-w-5xl space-y-6 p-4 border rounded-lg bg-card">
       {/* Content Type and Platform Selection */}
       <div className="flex items-center space-x-4">
-        <Select defaultValue={contentType} onValueChange={setContentType}>
+        <Select value={contentType} onValueChange={setContentType}>
           <SelectTrigger>
             <SelectValue placeholder="Select Content Type" />
           </SelectTrigger>
@@ -155,7 +155,7 @@ export default function Menubar() {
           </SelectContent>
         </Select>
 
-        <Select defaultValue={platform} onValueChange={setPlatform}>
+        <Select value={platform} onValueChange={setPlatform}>
           <SelectTrigger>
             <SelectValue placeholder="Select Platform" />
           </SelectTrigger>
@@ -193,7 +193,7 @@ export default function Menubar() {
       {/* Content Style Controls */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Select defaultValue={tone} onValueChange={setTone}>
+          <Select value={tone} onValueChange={setTone}>
             <SelectTrigger>
               <SelectValue placeholder="Select Tone" />
             </SelectTrigger>
@@ -221,7 +221,7 @@ export default function Menubar() {
         </div>
 
         <div className="space-y-2">
-          <Select defaultValue={length} onValueChange={setLength}>
+          <Select value={length} onValueChange={setLength}>
             <SelectTrigger>
               <SelectValue placeholder="Content Length" />
             </SelectTrigger>
@@ -278,7 +278,7 @@ export default function Menubar() {
       <div className="space-y-2">
         <label>Sentiment Control</label>
         <Slider
-          defaultValue={[sentiment]}
+          value={[sentiment]}
           onValueChange={(value) => setSentiment(value[0])}
           max={100}
           step={1}

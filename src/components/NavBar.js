@@ -20,7 +20,7 @@ export default function NavBar() {
                 className="flex items-center gap-2 font-bold text-xl hover:text-primary transition-colors"
               >
                 <Pen size={20} />
-                SocialScribe
+               <span>Social<span className="text-fuchsia-400 underline decoration-wavy decoration-white">Scribe</span></span> 
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
@@ -34,7 +34,7 @@ export default function NavBar() {
                 <NavigationMenuLink
                   variant="link"
                   href="/about"
-                  className="h-9 px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="h-9 underline px-4 py-2 text-sm font-medium rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   About
                 </NavigationMenuLink>
