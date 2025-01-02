@@ -1,0 +1,30 @@
+{
+  "version": 3,
+  "middleware": {},
+  "functions": {
+    "/_not-found/page": {
+      "files": [
+        "server/server-reference-manifest.js",
+        "server/app/_not-found/page_client-reference-manifest.js",
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "server/interception-route-rewrite-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/_not-found/page.js"
+      ],
+      "name": "app/_not-found/page",
+      "page": "/_not-found/page",
+      "matchers": [
+        {
+          "regexp": "^/_not\\-found$",
+          "originalSource": "/_not-found"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "environments": {}
+    }
+  },
+  "sortedMiddleware": []
+}

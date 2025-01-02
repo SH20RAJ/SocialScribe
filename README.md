@@ -1,82 +1,68 @@
-# SocialScribe ✍️
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`c3`](https://developers.cloudflare.com/pages/get-started/c3).
 
-**SocialScribe** is an AI-powered tool that helps you create tailored social media posts, comments, and direct messages (DMs) for platforms like LinkedIn, Twitter, Facebook, and more. You can easily write content by providing a context and selecting options such as tone, formality, and even whether you want it to be playful or professional! 😎
+## Getting Started
 
-[![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FSH20RAJ%2FSocialScribe&countColor=%23263759)](https://visitorbadge.io/status?path=https%3A%2F%2Fgithub.com%2FSH20RAJ%2FSocialScribe)
+First, run the development server:
 
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-## Features 🌟
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-- **Post Customization**: Select the tone (official, casual, playful, flirting, etc.) and other options for the post. 🎯
-- **Platform-Specific Adjustments**: Tailor content according to the platform (LinkedIn, Twitter, Facebook, etc.). 📱
-- **Emojis**: Add emojis to make posts more engaging and fun. 😄🌟🎉
-- **Content Types**: Generate not only posts but also comments and direct messages (DMs). 💬📩
-- **Target Audience**: Specify your audience (e.g., peers, clients, public). 🧑‍🤝‍🧑
-- **Content Length**: Choose between short, medium, or long posts. 📏
-- **Hashtags**: Generate relevant hashtags for the platform to increase visibility. #Hashtags 📈
-- **Sentiment Control**: Adjust the sentiment of the post (positive, neutral, or negative). ❤️😐💔
-- **Call to Action**: Automatically add a call to action like "Contact me" or "Learn more". 📞🖱️
-- **Language Support**: Write posts in different languages to cater to a global audience. 🌍
-- **Keywords**: Optimize content with user-specified keywords for SEO. 🔑💡
-- **Contextual Feedback**: If the options aren't exactly what you're looking for, provide feedback or write in the context directly! 📝💬
+## Cloudflare integration
 
-## How It Works 🔧
+Besides the `dev` script mentioned above `c3` has added a few extra scripts that allow you to integrate the application with the [Cloudflare Pages](https://pages.cloudflare.com/) environment, these are:
+  - `pages:build` to build the application for Pages using the [`@cloudflare/next-on-pages`](https://github.com/cloudflare/next-on-pages) CLI
+  - `preview` to locally preview your Pages application using the [Wrangler](https://developers.cloudflare.com/workers/wrangler/) CLI
+  - `deploy` to deploy your Pages application using the [Wrangler](https://developers.cloudflare.com/workers/wrangler/) CLI
 
-1. **Input Your Content**: Type or paste the content you want to share. 🖊️
-2. **Customize Your Post**: Choose the tone, target audience, content type, and length. 🎨
-3. **Generate Your Post**: The AI will rewrite your post to fit the selected platform and options. 🤖
-4. **Review and Publish**: Review the generated post and copy it for use on your social media. 📣
+> __Note:__ while the `dev` script is optimal for local development you should preview your Pages application as well (periodically or before deployments) in order to make sure that it can properly work in the Pages environment (for more details see the [`@cloudflare/next-on-pages` recommended workflow](https://github.com/cloudflare/next-on-pages/blob/main/internal-packages/next-dev/README.md#recommended-development-workflow))
 
-## Installation 🛠️
+### Bindings
 
-To get started with SocialScribe locally, follow these steps:
+Cloudflare [Bindings](https://developers.cloudflare.com/pages/functions/bindings/) are what allows you to interact with resources available in the Cloudflare Platform.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/socialscribe.git
-   ```
+You can use bindings during development, when previewing locally your application and of course in the deployed application:
 
-2. Navigate to the project directory:
-   ```bash
-   cd socialscribe
-   ```
+- To use bindings in dev mode you need to define them in the `next.config.js` file under `setupDevBindings`, this mode uses the `next-dev` `@cloudflare/next-on-pages` submodule. For more details see its [documentation](https://github.com/cloudflare/next-on-pages/blob/05b6256/internal-packages/next-dev/README.md).
 
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+- To use bindings in the preview mode you need to add them to the `pages:preview` script accordingly to the `wrangler pages dev` command. For more details see its [documentation](https://developers.cloudflare.com/workers/wrangler/commands/#dev-1) or the [Pages Bindings documentation](https://developers.cloudflare.com/pages/functions/bindings/).
 
-4. Run the project:
-   ```bash
-   npm start
-   ```
+- To use bindings in the deployed application you will need to configure them in the Cloudflare [dashboard](https://dash.cloudflare.com/). For more details see the  [Pages Bindings documentation](https://developers.cloudflare.com/pages/functions/bindings/).
 
-## Tech Stack 💻
+#### KV Example
 
-- **Frontend**: React.js / Next.js
-- **Backend**: Node.js
-- **AI Models**: OpenAI GPT for natural language generation
-- **Database**: MongoDB (if you plan to store user data)
-- **Authentication**: JWT or OAuth (for social media integrations)
+`c3` has added for you an example showing how you can use a KV binding.
 
-## Contributing 🤝
+In order to enable the example:
+- Search for javascript/typescript lines containing the following comment:
+  ```ts
+  // KV Example:
+  ```
+  and uncomment the commented lines below it.
+- Do the same in the `wrangler.toml` file, where
+  the comment is:
+  ```
+  # KV Example:
+  ```
+- If you're using TypeScript run the `cf-typegen` script to update the `env.d.ts` file:
+  ```bash
+  npm run cf-typegen
+  # or
+  yarn cf-typegen
+  # or
+  pnpm cf-typegen
+  # or
+  bun cf-typegen
+  ```
 
-We welcome contributions! If you'd like to contribute, fork the repository and submit a pull request. Here’s how:
+After doing this you can run the `dev` or `preview` script and visit the `/api/hello` route to see the example in action.
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add new feature'`).
-5. Push to the branch (`git push origin feature/your-feature-name`).
-6. Submit a pull request.
-
-## License 📝
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact 📧
-
-For support or inquiries, reach out to:
-
-- Email: [sh20raj@gmail.com](mailto:sh20raj@gmail.com)
-- Website: [https://socialscribe.pages.dev/](https://socialscribe.pages.dev/)
+Finally, if you also want to see the example work in the deployed application make sure to add a `MY_KV_NAMESPACE` binding to your Pages application in its [dashboard kv bindings settings section](https://dash.cloudflare.com/?to=/:account/pages/view/:pages-project/settings/functions#kv_namespace_bindings_section). After having configured it make sure to re-deploy your application.
