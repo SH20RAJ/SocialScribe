@@ -10,7 +10,7 @@ import { Github, Pen } from "lucide-react";
 export default function NavBar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between">
+      <div className="container px-40 flex h-14 items-center justify-between">
         {/* Logo and name on the left */}
         <NavigationMenu>
           <NavigationMenuList>
