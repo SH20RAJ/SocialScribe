@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SocialScribe+</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 350px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .header {
+      padding: 20px;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .logo svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .logo h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .tagline {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 20px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .feature:last-child {
+      border-bottom: none;
+    }
+
+    .feature-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .feature-text h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .feature-text p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .status {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .status-active {
+      background: rgba(34, 197, 94, 0.2);
+    }
+
+    .status h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .status p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .footer {
+      padding: 16px 20px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .footer a:hover {
+      opacity: 1;
+    }
+
+    .settings-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+
+    .settings-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+        <path d="M19 15L20.09 18.26L23 19L20.09 19.74L19 23L17.91 19.74L15 19L17.91 18.26L19 15Z" fill="currentColor"/>
+        <path d="M5 6L6.09 9.26L9 10L6.09 10.74L5 14L3.91 10.74L1 10L3.91 9.26L5 6Z" fill="currentColor"/>
+      </svg>
+      <h1>SocialScribe+</h1>
+    </div>
+    <p class="tagline">AI-powered writing assistant</p>
+  </div>
+
+  <div class="content">
+    <div class="feature">
+      <div class="feature-icon">✓</div>
+      <div class="feature-text">
+        <h3>Grammar Fixer</h3>
+        <p>Fix grammar and spelling instantly</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">✍️</div>
+      <div class="feature-text">
+        <h3>Tone Rewriter</h3>
+        <p>Rewrite in any tone you need</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">🌐</div>
+      <div class="feature-text">
+        <h3>Works Everywhere</h3>
+        <p>Twitter, LinkedIn, Gmail, and more</p>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <div class="feature-text">
+        <h3>Keyboard Shortcut</h3>
+        <p>Press Cmd/Ctrl + Shift + G</p>
+      </div>
+    </div>
+
+    <div class="status status-active">
+      <h4>🟢 Extension Active</h4>
+      <p>Ready to help improve your writing</p>
+    </div>
+
+    <button class="settings-btn" id="settingsBtn">⚙️ Settings</button>
+  </div>
+
+  <div class="footer">
+    <a href="https://socialscribe.pages.dev" target="_blank">
+      Visit SocialScribe+ Website
+    </a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
