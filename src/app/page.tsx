@@ -3,6 +3,7 @@ import { Brain, Chrome, Download, Sparkles, Zap, Globe, MessageCircle, Mail, Fil
 import Link from "next/link"
 import RewriteDemo from "@/components/RewriteDemo"
 import ExtensionInstallGuide from "@/components/ExtensionInstallGuide"
+import UserAuth from "@/components/UserAuth"
 
 export default function Home() {
   return (
@@ -36,6 +37,7 @@ export default function Home() {
                 Get Extension
               </Link>
             </Button>
+            <UserAuth />
           </nav>
         </div>
       </header>
@@ -386,6 +388,40 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Supported Platforms */}
+      <section className="mb-24 flex items-center justify-center flex-col py-16 px-6 bg-muted/30">
+        <h2 className="text-3xl font-bold text-foreground text-center mb-8">
+          Works Everywhere You Write
+        </h2>
+        <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
+          SocialScribe+ seamlessly integrates with your favorite platforms. Enjoy AI-powered writing assistance wherever you type.
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8 max-w-6xl">
+          {[
+        { icon: Twitter, name: "Twitter/X", color: "bg-blue-50 text-blue-500", ring: "ring-blue-100" },
+        { icon: Linkedin, name: "LinkedIn", color: "bg-blue-50 text-blue-600", ring: "ring-blue-100" },
+        { icon: Mail, name: "Gmail", color: "bg-red-50 text-red-500", ring: "ring-red-100" },
+        { icon: FileText, name: "Medium", color: "bg-green-50 text-green-600", ring: "ring-green-100" },
+        { icon: MessageCircle, name: "Reddit", color: "bg-orange-50 text-orange-500", ring: "ring-orange-100" },
+        { icon: Globe, name: "Facebook", color: "bg-blue-100 text-blue-700", ring: "ring-blue-200" },
+        { icon: FileText, name: "Notion", color: "bg-gray-100 text-gray-700", ring: "ring-gray-200" },
+        { icon: Chrome, name: "Any Website", color: "bg-gray-50 text-gray-600", ring: "ring-gray-100" }
+          ].map((platform, index) => (
+        <div
+          key={index}
+          className={`flex flex-col items-center justify-center p-6 bg-card rounded-xl border border-border shadow-sm hover:shadow-lg transition-shadow group`}
+        >
+          <div
+            className={`mb-3 rounded-full p-4 ${platform.color} shadow-md group-hover:scale-110 transition-transform ring-2 ${platform.ring}`}
+          >
+            <platform.icon className="h-8 w-8" />
+          </div>
+          <p className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">{platform.name}</p>
+        </div>
+          ))}
+        </div>
+      </section>
+
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-border bg-background">

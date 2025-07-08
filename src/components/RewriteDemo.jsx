@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Loader2, Copy, Check, Sparkles, X, FileText, Type } from "lucide-react"
@@ -10,13 +10,70 @@ import { marked } from 'marked'
 export default function RewriteDemo() {
   const [inputText, setInputText] = useState("")
   const [outputText, setOutputText] = useState("")
-  const [selectedAction, setSelectedAction] = useState("fix_grammar")
+  const [selectedAction, setSelectedAction] = useState("rewrite")
   const [selectedTone, setSelectedTone] = useState("professional")
   const [customTone, setCustomTone] = useState("")
   const [customInstructions, setCustomInstructions] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copyType, setCopyType] = useState("")
+
+  // Sample texts for different scenarios
+  const sampleTexts = [
+    {
+      category: "Business Email",
+      text: "Hi there, I hope your doing well. I wanted to reach out about the project we discussed last week. Can we schedule a meeting to go over the details? Let me know what works for you. Thanks!"
+    },
+    {
+      category: "Social Media",
+      text: "just finished watching the new movie and it was absolutely amazing! the plot twists were incredible and the acting was top notch. definitely recommend it to anyone who loves good cinema"
+    },
+    {
+      category: "Academic",
+      text: "The research shows that climate change is having significant impacts on global weather patterns. This phenomena is causing more frequent extreme weather events which effects millions of people worldwide."
+    },
+    {
+      category: "Casual Message",
+      text: "hey! how r u doing? i was thinking we could hangout this weekend maybe grab some coffee or something. what do u think? lmk when ur free"
+    },
+    {
+      category: "Professional",
+      text: "I am writing to inform you that the quarterly report will be delayed due to unforeseen circumstances. We apologize for any inconvenience this may cause and will provide an updated timeline soon."
+    }
+  ]
+
+  // Load saved preferences on component mount
+  useEffect(() => {
+    const savedPreferences = localStorage.getItem('socialscribe-demo-preferences')
+    if (savedPreferences) {
+      try {
+        const prefs = JSON.parse(savedPreferences)
+        setSelectedAction(prefs.selectedAction || "rewrite")
+        setSelectedTone(prefs.selectedTone || "professional")
+        setCustomTone(prefs.customTone || "")
+        setCustomInstructions(prefs.customInstructions || "")
+        setInputText(prefs.inputText || "")
+      } catch (error) {
+        console.error('Error loading saved preferences:', error)
+      }
+    }
+  }, [])
+
+  // Save preferences whenever they change
+  useEffect(() => {
+    const preferences = {
+      selectedAction,
+      selectedTone,
+      customTone,
+      customInstructions,
+      inputText
+    }
+    localStorage.setItem('socialscribe-demo-preferences', JSON.stringify(preferences))
+  }, [selectedAction, selectedTone, customTone, customInstructions, inputText])
+
+  const addSampleText = (sampleText) => {
+    setInputText(sampleText)
+  }
 
   const handleRewrite = async () => {
     if (!inputText.trim()) return
@@ -157,13 +214,40 @@ export default function RewriteDemo() {
           {/* Input Section */}
           <div className="space-y-6">
             <div>
-              <label className="text-sm font-medium text-gray-900 mb-3 block">
-                Your text
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium text-gray-900">
+                  Your text
+                </label>
+                <div className="flex items-center gap-2">
+                  <select 
+                    className="text-xs border border-gray-200 rounded px-2 py-1 text-gray-600"
+                    onChange={(e) => {
+                      const selectedSample = sampleTexts.find(sample => sample.category === e.target.value)
+                      if (selectedSample) {
+                        addSampleText(selectedSample.text)
+                      }
+                    }}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Try sample text</option>
+                    {sampleTexts.map((sample, index) => (
+                      <option key={index} value={sample.category}>
+                        {sample.category}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => setInputText("")}
+                    className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 border border-gray-200 rounded"
+                  >
+                    Clear
+                  </button>
+                </div>
+              </div>
               <Textarea
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Type or paste your text here..."
+                placeholder="Type or paste your text here, or select a sample above..."
                 className="min-h-[140px] border-gray-200 focus:border-gray-400 focus:ring-0 resize-none"
               />
             </div>

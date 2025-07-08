@@ -46,6 +46,9 @@ class SocialScribeBackground {
     // Set initial badge
     this.updateBadge();
     
+    // Set uninstall URL for all installs
+    chrome.runtime.setUninstallURL('https://socialscribe.pages.dev/uninstall');
+    
     if (details.reason === 'install') {
       // First-time installation
       this.handleFirstInstall();
@@ -75,8 +78,11 @@ class SocialScribeBackground {
   handleFirstInstall() {
     // Open welcome page
     chrome.tabs.create({ 
-      url: 'https://socialscribe.pages.dev?welcome=true' 
+      url: 'https://socialscribe.pages.dev/welcome' 
     });
+
+    // Set uninstall URL
+    chrome.runtime.setUninstallURL('https://socialscribe.pages.dev/uninstall');
 
     // Track installation
     this.trackEvent('extension_installed');
