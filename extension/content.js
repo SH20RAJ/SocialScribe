@@ -26,14 +26,22 @@ class SocialScribeWidget {
   }
 
   init() {
+    console.log('SocialScribe: Initializing content script');
     this.injectStyles();
     this.setupObserver();
-    this.attachToExistingFields();
+    
+    // Wait a bit for page to load, then attach to existing fields
+    setTimeout(() => {
+      this.attachToExistingFields();
+    }, 1000);
+    
     this.setupKeyboardShortcuts();
     this.setupMessageListener();
     
     // Platform-specific initialization
     this.platformSpecificInit();
+    
+    console.log('SocialScribe: Content script initialized');
   }
 
   injectStyles() {
@@ -121,7 +129,9 @@ class SocialScribeWidget {
 
   attachToExistingFields() {
     const selectors = this.getTextFieldSelectors();
+    console.log('SocialScribe: Looking for elements with selectors:', selectors);
     const elements = document.querySelectorAll(selectors.join(', '));
+    console.log('SocialScribe: Found', elements.length, 'text elements');
     
     elements.forEach(element => {
       this.attachToElement(element);
@@ -187,6 +197,7 @@ class SocialScribeWidget {
       return;
     }
 
+    console.log('SocialScribe: Attaching to element', element);
     element.dataset.socialscribeAttached = 'true';
     
     // Create widget for this element
@@ -195,20 +206,39 @@ class SocialScribeWidget {
     // Setup event listeners
     this.setupElementListeners(element, widget);
     
-    // Position widget
+    // Position widget initially (hidden)
     this.positionWidget(element, widget);
+    
+    console.log('SocialScribe: Widget created and attached', widget);
   }
 
   isValidElement(element) {
-    const rect = element.getBoundingClientRect();
-    const style = window.getComputedStyle(element);
-    
-    return rect.width > 50 && 
-           rect.height > 20 && 
-           style.display !== 'none' && 
-           style.visibility !== 'hidden' &&
-           !element.disabled &&
-           !element.readOnly;
+    try {
+      const rect = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      
+      const isValid = rect.width > 20 && 
+             rect.height > 15 && 
+             style.display !== 'none' && 
+             style.visibility !== 'hidden' &&
+             !element.disabled &&
+             !element.readOnly;
+      
+      console.log('SocialScribe: Element validation', element, {
+        width: rect.width,
+        height: rect.height,
+        display: style.display,
+        visibility: style.visibility,
+        disabled: element.disabled,
+        readOnly: element.readOnly,
+        isValid
+      });
+      
+      return isValid;
+    } catch (error) {
+      console.error('SocialScribe: Error validating element', error);
+      return false;
+    }
   }
 
   createWidget(element) {
@@ -231,11 +261,15 @@ class SocialScribeWidget {
     `;
 
     widget.appendChild(button);
-    document.body.appendChild(widget);
-
+    
     // Create quick panel
     const panel = this.createQuickPanel();
     widget.appendChild(panel);
+    
+    // Initially hide the widget
+    widget.style.display = 'none';
+    
+    document.body.appendChild(widget);
 
     return widget;
   }
@@ -476,6 +510,7 @@ class SocialScribeWidget {
   }
 
   showWidget(widget) {
+    console.log('SocialScribe: Showing widget', widget);
     widget.style.display = 'block';
     const button = widget.querySelector('.socialscribe-floating-button');
     setTimeout(() => {

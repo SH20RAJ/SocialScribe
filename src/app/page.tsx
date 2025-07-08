@@ -1,3 +1,4 @@
+export const runtime = 'edge';
 import { Button } from "@/components/ui/button"
 import { Brain, Chrome, Download, Sparkles, Zap, Globe, MessageCircle, Mail, FileText, Twitter, Linkedin } from "lucide-react"
 import Link from "next/link"

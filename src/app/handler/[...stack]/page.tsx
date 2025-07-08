@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { StackHandler } from "@stackframe/stack";
 import { stackServerApp } from "../../../stack";
 

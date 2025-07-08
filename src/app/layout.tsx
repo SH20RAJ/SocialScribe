@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { Inter } from 'next/font/google'
 import { StackProvider, StackTheme } from "@stackframe/stack";
 import { stackServerApp } from "../stack";

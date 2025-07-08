@@ -1,5 +1,7 @@
 "use client"
 
+export const runtime = 'edge';
+
 import { Button } from "@/components/ui/button"
 import { Brain, Chrome, CheckCircle, Sparkles, Zap, Globe, MessageCircle, Mail, FileText, Twitter, Linkedin, ArrowRight, Star, Users, Shield } from "lucide-react"
 import Link from "next/link"
