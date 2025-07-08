@@ -1,458 +1,267 @@
-// SocialScribe Redesigned Popup JavaScript
+// SocialScribe+ Popup Script
+// Grammarly-like interface for the extension popup
+
 class SocialScribePopup {
   constructor() {
-    this.currentTab = 'rewriter';
-    this.selectedTone = 'professional';
-    this.customTone = '';
-    this.isLoading = false;
-    this.apiUrl = 'https://socialscribe.pages.dev/api/rewrite';
-    
     this.init();
   }
 
-  init() {
-    this.setupTabNavigation();
-    this.setupToneSelector();
-    this.setupRewriteButton();
-    this.setupCustomToneInput();
-    this.setupToggleButtons();
-    this.loadSavedData();
-    this.setupKeyboardShortcuts();
+  async init() {
+    await this.loadUserData();
+    this.setupEventListeners();
+    this.updateUI();
+    this.checkCurrentTab();
   }
 
-  setupTabNavigation() {
-    const tabs = document.querySelectorAll('.nav-tab');
-    const tabContents = document.querySelectorAll('.tab-content');
+  async loadUserData() {
+    try {
+      const result = await chrome.storage.local.get(['isEnabled', 'userStats', 'settings']);
+      this.isEnabled = result.isEnabled !== false; // Default to true
+      this.userStats = result.userStats || { corrections: 0, wordsImproved: 0, timesSaved: 0 };
+      this.settings = result.settings || { 
+        autoCorrect: true, 
+        toneDetection: true, 
+        contextAware: true,
+        showSuggestions: true 
+      };
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      this.isEnabled = true;
+      this.userStats = { corrections: 0, wordsImproved: 0, timesSaved: 0 };
+      this.settings = { autoCorrect: true, toneDetection: true, contextAware: true, showSuggestions: true };
+    }
+  }
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const targetTab = tab.dataset.tab;
-        
-        // Update active tab
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        // Show corresponding content
-        tabContents.forEach(content => {
-          content.style.display = 'none';
-        });
-        
-        const targetContent = document.getElementById(`${targetTab}-tab`);
-        if (targetContent) {
-          targetContent.style.display = 'block';
-          targetContent.style.animation = 'slideIn 0.3s ease';
-        }
-        
-        this.currentTab = targetTab;
-        this.saveData();
+  setupEventListeners() {
+    // Toggle switch
+    const toggleSwitch = document.getElementById('enableToggle');
+    if (toggleSwitch) {
+      toggleSwitch.checked = this.isEnabled;
+      toggleSwitch.addEventListener('change', (e) => {
+        this.toggleExtension(e.target.checked);
+      });
+    }
+
+    // Settings toggles
+    const settingsToggles = document.querySelectorAll('.setting-toggle');
+    settingsToggles.forEach(toggle => {
+      const setting = toggle.dataset.setting;
+      if (this.settings[setting] !== undefined) {
+        toggle.checked = this.settings[setting];
+      }
+      toggle.addEventListener('change', (e) => {
+        this.updateSetting(setting, e.target.checked);
       });
     });
-  }
 
-  setupToneSelector() {
-    const toneOptions = document.querySelectorAll('.tone-option');
-    
-    toneOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        // Remove active class from all options
-        toneOptions.forEach(opt => opt.classList.remove('active'));
-        
-        // Add active class to clicked option
-        option.classList.add('active');
-        
-        // Update selected tone
-        this.selectedTone = option.dataset.tone;
-        
-        // Hide custom tone input if not custom
-        const customInput = document.getElementById('customToneInput');
-        if (this.selectedTone !== 'custom') {
-          customInput.classList.remove('active');
-          this.customTone = '';
-        }
-        
-        this.saveData();
-        this.addHapticFeedback();
-      });
+    // Action buttons
+    document.getElementById('openWebApp')?.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://socialscribe.pages.dev' });
     });
+
+    document.getElementById('viewStats')?.addEventListener('click', () => {
+      this.showStatsModal();
+    });
+
+    document.getElementById('reportIssue')?.addEventListener('click', () => {
+      chrome.tabs.create({ url: 'https://socialscribe.pages.dev/support' });
+    });
+
+    // Quick actions
+    document.getElementById('quickFix')?.addEventListener('click', () => {
+      this.performQuickAction('fix');
+    });
+
+    document.getElementById('quickRewrite')?.addEventListener('click', () => {
+      this.performQuickAction('rewrite');
+    });
+
+    document.getElementById('quickTone')?.addEventListener('click', () => {
+      this.performQuickAction('tone');
+    });
+
+    // Close modal
+    document.getElementById('closeModal')?.addEventListener('click', () => {
+      this.hideStatsModal();
+    });
+
+    // Custom instructions
+    document.getElementById('saveInstructions')?.addEventListener('click', () => {
+      this.saveCustomInstructions();
+    });
+
+    // Load custom instructions
+    this.loadCustomInstructions();
   }
 
-  setupCustomToneInput() {
-    const customInput = document.getElementById('customToneInput');
+  async toggleExtension(enabled) {
+    this.isEnabled = enabled;
+    await chrome.storage.local.set({ isEnabled: enabled });
     
-    customInput.addEventListener('click', () => {
-      if (!customInput.classList.contains('active')) {
-        // Activate custom tone
-        document.querySelectorAll('.tone-option').forEach(opt => opt.classList.remove('active'));
-        customInput.classList.add('active');
-        this.selectedTone = 'custom';
-        
-        // Convert to input field
-        const currentText = customInput.textContent;
-        customInput.innerHTML = `<input type="text" placeholder="e.g., witty and professional" style="
-          background: transparent;
-          border: none;
-          outline: none;
-          width: 100%;
-          text-align: center;
-          font-size: 13px;
-          color: var(--primary);
-        ">`;
-        
-        const input = customInput.querySelector('input');
-        input.focus();
-        
-        input.addEventListener('blur', () => {
-          const value = input.value.trim();
-          if (value) {
-            this.customTone = value;
-            customInput.innerHTML = `✨ ${value}`;
-          } else {
-            customInput.classList.remove('active');
-            customInput.innerHTML = '✨ Describe custom tone...';
-            this.selectedTone = 'professional';
-            document.querySelector('[data-tone="professional"]').classList.add('active');
-          }
-          this.saveData();
-        });
-        
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            input.blur();
-          }
+    // Send message to content script
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        chrome.tabs.sendMessage(tab.id, { 
+          action: 'toggleExtension', 
+          enabled: enabled 
         });
       }
-    });
+    } catch (error) {
+      console.error('Error sending message to content script:', error);
+    }
+
+    this.updateUI();
+    this.showToast(enabled ? 'SocialScribe+ enabled' : 'SocialScribe+ disabled');
   }
 
-  setupRewriteButton() {
-    const button = document.getElementById('rewriteButton');
-    const inputText = document.getElementById('inputText');
+  async updateSetting(setting, value) {
+    this.settings[setting] = value;
+    await chrome.storage.local.set({ settings: this.settings });
     
-    button.addEventListener('click', () => {
-      this.handleRewrite();
-    });
-    
-    // Auto-save input text
-    inputText.addEventListener('input', () => {
-      this.saveData();
-      this.updateButtonState();
-    });
-    
-    // Initial button state
-    this.updateButtonState();
+    // Send updated settings to content script
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        chrome.tabs.sendMessage(tab.id, { 
+          action: 'updateSettings', 
+          settings: this.settings 
+        });
+      }
+    } catch (error) {
+      console.error('Error sending settings to content script:', error);
+    }
   }
 
-  updateButtonState() {
-    const button = document.getElementById('rewriteButton');
-    const inputText = document.getElementById('inputText').value.trim();
-    
-    if (!inputText) {
-      button.disabled = true;
-      button.style.opacity = '0.6';
+  updateUI() {
+    const statusElement = document.getElementById('status');
+    const statusDot = document.querySelector('.status-dot');
+    const quickActions = document.getElementById('quickActions');
+
+    if (this.isEnabled) {
+      statusElement.textContent = 'Active';
+      statusElement.className = 'status active';
+      statusDot.className = 'status-dot active';
+      quickActions.style.display = 'block';
     } else {
-      button.disabled = false;
-      button.style.opacity = '1';
+      statusElement.textContent = 'Disabled';
+      statusElement.className = 'status disabled';
+      statusDot.className = 'status-dot disabled';
+      quickActions.style.display = 'none';
+    }
+
+    // Update stats
+    document.getElementById('correctionsCount').textContent = this.userStats.corrections;
+    document.getElementById('wordsCount').textContent = this.userStats.wordsImproved;
+    document.getElementById('timesCount').textContent = this.userStats.timesSaved;
+  }
+
+  async checkCurrentTab() {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        const siteInfo = this.getSiteInfo(tab.url);
+        document.getElementById('currentSite').textContent = siteInfo.name;
+        
+        // Check if site is supported
+        const supportedElement = document.getElementById('siteSupported');
+        if (siteInfo.supported) {
+          supportedElement.textContent = '✓ Supported';
+          supportedElement.className = 'site-status supported';
+        } else {
+          supportedElement.textContent = '⚠ Limited support';
+          supportedElement.className = 'site-status limited';
+        }
+      }
+    } catch (error) {
+      console.error('Error checking current tab:', error);
     }
   }
 
-  async handleRewrite() {
-    const inputText = document.getElementById('inputText').value.trim();
-    const button = document.getElementById('rewriteButton');
-    const resultSection = document.getElementById('resultSection');
-    
-    if (!inputText) {
-      this.showToast('Please enter some text to rewrite', 'warning');
-      return;
+  getSiteInfo(url) {
+    const supportedSites = {
+      'twitter.com': { name: 'Twitter', supported: true },
+      'x.com': { name: 'X (Twitter)', supported: true },
+      'linkedin.com': { name: 'LinkedIn', supported: true },
+      'gmail.com': { name: 'Gmail', supported: true },
+      'outlook.com': { name: 'Outlook', supported: true },
+      'facebook.com': { name: 'Facebook', supported: true },
+      'instagram.com': { name: 'Instagram', supported: true },
+      'reddit.com': { name: 'Reddit', supported: true },
+      'medium.com': { name: 'Medium', supported: true },
+      'notion.so': { name: 'Notion', supported: true }
+    };
+
+    for (const [domain, info] of Object.entries(supportedSites)) {
+      if (url.includes(domain)) {
+        return info;
+      }
     }
-    
-    if (this.selectedTone === 'custom' && !this.customTone) {
-      this.showToast('Please describe your custom tone', 'warning');
-      return;
+
+    return { name: 'Current site', supported: false };
+  }
+
+  async performQuickAction(action) {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      if (tab) {
+        chrome.tabs.sendMessage(tab.id, { 
+          action: 'quickAction', 
+          type: action 
+        });
+        this.showToast(`${action.charAt(0).toUpperCase() + action.slice(1)} applied`);
+      }
+    } catch (error) {
+      console.error('Error performing quick action:', error);
+      this.showToast('Error: Please refresh the page and try again');
     }
-    
-    this.setLoadingState(true);
+  }
+
+  showStatsModal() {
+    document.getElementById('statsModal').style.display = 'flex';
+  }
+
+  hideStatsModal() {
+    document.getElementById('statsModal').style.display = 'none';
+  }
+
+  async saveCustomInstructions() {
+    const textarea = document.getElementById('customInstructions');
+    const instructions = textarea.value.trim();
     
     try {
-      const tone = this.selectedTone === 'custom' ? this.customTone : this.selectedTone;
-      
-      const response = await fetch(this.apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: inputText,
-          action: 'rewrite',
-          tone: tone,
-          platform: 'general'
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to rewrite text');
-      }
-
-      let result = '';
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value);
-        const lines = chunk.split('\n');
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.content) {
-                result += parsed.content;
-                // Update result in real-time
-                document.getElementById('resultText').textContent = result;
-                resultSection.style.display = 'block';
-              }
-            } catch (e) {
-              // Skip invalid JSON
-            }
-          }
-        }
-      }
-
-      if (result.trim()) {
-        this.showResult(result.trim());
-        this.addToHistory(inputText, result.trim(), tone);
-        this.showToast('Text rewritten successfully!', 'success');
-        this.addHapticFeedback();
-      }
-
+      await chrome.storage.local.set({ customInstructions: instructions });
+      this.showToast('Custom instructions saved!');
     } catch (error) {
-      console.error('Rewrite error:', error);
-      this.showToast('Failed to rewrite text. Please try again.', 'error');
-    } finally {
-      this.setLoadingState(false);
+      console.error('Error saving custom instructions:', error);
+      this.showToast('Error saving instructions');
     }
   }
 
-  setLoadingState(loading) {
-    const button = document.getElementById('rewriteButton');
-    const buttonContent = button.querySelector('.action-button-content');
-    
-    this.isLoading = loading;
-    
-    if (loading) {
-      button.disabled = true;
-      buttonContent.innerHTML = `
-        <div class="loading">
-          <div class="loading-spinner"></div>
-          <span>Rewriting...</span>
-        </div>
-      `;
-    } else {
-      button.disabled = false;
-      buttonContent.innerHTML = `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-        </svg>
-        <span>Rewrite with AI</span>
-      `;
-      this.updateButtonState();
-    }
-  }
-
-  showResult(text) {
-    const resultSection = document.getElementById('resultSection');
-    const resultText = document.getElementById('resultText');
-    
-    resultText.textContent = text;
-    resultSection.style.display = 'block';
-    resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    // Setup copy button
-    const copyButton = document.getElementById('copyButton');
-    copyButton.onclick = () => {
-      navigator.clipboard.writeText(text).then(() => {
-        copyButton.textContent = 'Copied!';
-        setTimeout(() => {
-          copyButton.textContent = 'Copy';
-        }, 2000);
-        this.addHapticFeedback();
-      });
-    };
-  }
-
-  setupToggleButtons() {
-    const toggles = document.querySelectorAll('.toggle');
-    
-    toggles.forEach(toggle => {
-      toggle.addEventListener('click', () => {
-        toggle.classList.toggle('active');
-        this.addHapticFeedback();
-        
-        // Handle specific toggle actions
-        const settingItem = toggle.closest('.setting-item');
-        const label = settingItem.querySelector('.setting-label').textContent;
-        
-        if (label === 'Dark mode') {
-          this.toggleDarkMode(toggle.classList.contains('active'));
-        }
-        
-        this.saveData();
-      });
-    });
-  }
-
-  toggleDarkMode(enabled) {
-    if (enabled) {
-      document.body.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark');
-    }
-  }
-
-  setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-      // Cmd/Ctrl + Enter to rewrite
-      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        e.preventDefault();
-        this.handleRewrite();
+  async loadCustomInstructions() {
+    try {
+      const result = await chrome.storage.local.get(['customInstructions']);
+      const textarea = document.getElementById('customInstructions');
+      if (textarea && result.customInstructions) {
+        textarea.value = result.customInstructions;
       }
-      
-      // Cmd/Ctrl + 1-4 for tab navigation
-      if ((e.metaKey || e.ctrlKey) && ['1', '2', '3', '4'].includes(e.key)) {
-        e.preventDefault();
-        const tabIndex = parseInt(e.key) - 1;
-        const tabs = document.querySelectorAll('.nav-tab');
-        if (tabs[tabIndex]) {
-          tabs[tabIndex].click();
-        }
-      }
-    });
-  }
-
-  addToHistory(original, rewritten, tone) {
-    const history = this.getHistory();
-    const entry = {
-      id: Date.now(),
-      original,
-      rewritten,
-      tone,
-      timestamp: new Date().toISOString(),
-      platform: this.detectCurrentPlatform()
-    };
-    
-    history.unshift(entry);
-    
-    // Keep only last 50 entries
-    if (history.length > 50) {
-      history.splice(50);
+    } catch (error) {
+      console.error('Error loading custom instructions:', error);
     }
-    
-    chrome.storage.local.set({ socialscribeHistory: history });
   }
 
-  getHistory() {
-    // This would be loaded from chrome.storage.local
-    return [];
-  }
-
-  detectCurrentPlatform() {
-    // This would detect the current website
-    return 'extension';
-  }
-
-  showToast(message, type = 'info') {
-    // Create toast notification
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
+  showToast(message) {
+    const toast = document.getElementById('toast');
     toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      color: white;
-      font-size: 13px;
-      font-weight: 500;
-      z-index: 1000;
-      animation: slideIn 0.3s ease;
-      background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--error)' : 'var(--warning)'};
-    `;
-    
-    document.body.appendChild(toast);
-    
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+
     setTimeout(() => {
-      toast.remove();
-    }, 3000);
-  }
-
-  addHapticFeedback() {
-    // Subtle visual feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(10);
-    }
-  }
-
-  saveData() {
-    const data = {
-      currentTab: this.currentTab,
-      selectedTone: this.selectedTone,
-      customTone: this.customTone,
-      inputText: document.getElementById('inputText').value,
-      darkMode: document.body.classList.contains('dark')
-    };
-    
-    chrome.storage.local.set({ socialscribePopupData: data });
-  }
-
-  loadSavedData() {
-    chrome.storage.local.get(['socialscribePopupData'], (result) => {
-      const data = result.socialscribePopupData || {};
-      
-      // Restore input text
-      if (data.inputText) {
-        document.getElementById('inputText').value = data.inputText;
-      }
-      
-      // Restore selected tone
-      if (data.selectedTone) {
-        this.selectedTone = data.selectedTone;
-        if (data.selectedTone === 'custom' && data.customTone) {
-          this.customTone = data.customTone;
-          const customInput = document.getElementById('customToneInput');
-          customInput.classList.add('active');
-          customInput.innerHTML = `✨ ${data.customTone}`;
-        } else {
-          const toneOption = document.querySelector(`[data-tone="${data.selectedTone}"]`);
-          if (toneOption) {
-            document.querySelectorAll('.tone-option').forEach(opt => opt.classList.remove('active'));
-            toneOption.classList.add('active');
-          }
-        }
-      }
-      
-      // Restore dark mode
-      if (data.darkMode) {
-        document.body.classList.add('dark');
-        const darkModeToggle = document.querySelector('.setting-item:nth-child(2) .toggle');
-        if (darkModeToggle) {
-          darkModeToggle.classList.add('active');
-        }
-      }
-      
-      // Restore current tab
-      if (data.currentTab && data.currentTab !== 'rewriter') {
-        const tab = document.querySelector(`[data-tab="${data.currentTab}"]`);
-        if (tab) {
-          tab.click();
-        }
-      }
-      
-      this.updateButtonState();
-    });
+      toast.style.opacity = '0';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 300);
+    }, 2000);
   }
 }
 
@@ -461,10 +270,14 @@ document.addEventListener('DOMContentLoaded', () => {
   new SocialScribePopup();
 });
 
-// Handle extension context
-if (typeof chrome !== 'undefined' && chrome.runtime) {
-  // Extension-specific initialization
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    // Could send message to content script if needed
-  });
-}
+// Handle messages from background script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'updateStats') {
+    // Update stats in real-time
+    const popup = window.socialScribePopup;
+    if (popup) {
+      popup.userStats = message.stats;
+      popup.updateUI();
+    }
+  }
+});
