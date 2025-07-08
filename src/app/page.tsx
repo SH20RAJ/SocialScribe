@@ -27,6 +27,9 @@ export default function Home() {
             <Link href="#demo" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
               Rewriter
             </Link>
+            <Link href="#coming-soon" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+              Coming Soon
+            </Link>
             <Link href="#install" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
               Install
             </Link>
@@ -153,6 +156,143 @@ export default function Home() {
           </div>
           
           <RewriteDemo />
+        </div>
+      </section>
+
+      {/* Coming Soon Features */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-sm mb-6">
+              <Sparkles className="h-3 w-3" />
+              Coming Soon
+            </div>
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">AI Chat Assistant</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Revolutionary context-aware chat suggestions that understand your conversations 
+              and suggest perfect replies across all platforms
+            </p>
+          </div>
+          
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Feature Description */}
+            <div className="space-y-8">
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="h-4 w-4 text-gray-700" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Context-Aware Suggestions</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      AI reads your entire conversation history and suggests 2-3 perfect replies 
+                      that match the context and tone of your chat.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-4 w-4 text-gray-700" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">One-Click Replies</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Click any suggestion to instantly send it, or click to edit before sending. 
+                      No more typing - just smart, contextual responses.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Globe className="h-4 w-4 text-gray-700" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Works Everywhere</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      LinkedIn messages, Instagram DMs, Twitter chats, WhatsApp Web, 
+                      and any messaging platform you use.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Brain className="h-4 w-4 text-gray-700" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-2">Tone Matching</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Choose your reply style: Professional for LinkedIn, Casual for friends, 
+                      Flirty for dating apps, or let AI match the conversation tone.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-200">
+                <p className="text-sm text-gray-500 mb-4">
+                  Join the waitlist to be the first to try these features:
+                </p>
+                <div className="flex gap-3">
+                  <Button className="bg-gray-900 hover:bg-gray-800 text-white border-0">
+                    Join Waitlist
+                  </Button>
+                  <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
+                    Learn More
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Visual Preview */}
+            <div className="bg-gray-50 rounded-lg p-6">
+              <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+                  <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">L</span>
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">LinkedIn Chat</div>
+                    <div className="text-xs text-gray-500">Sarah Johnson • Online</div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-end">
+                    <div className="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs">
+                      Hey Sarah! I saw your post about the new marketing strategy. Really insightful!
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-start">
+                    <div className="bg-gray-100 px-3 py-2 rounded-lg text-sm max-w-xs">
+                      Thanks! I'd love to discuss it further. Are you free for a quick call this week?
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    AI Suggestions
+                  </div>
+                  <div className="space-y-2">
+                    <button className="w-full text-left p-2 bg-gray-50 hover:bg-gray-100 rounded-md text-sm border border-gray-200 transition-colors">
+                      "Absolutely! I'm available Tuesday or Wednesday afternoon. Which works better for you?"
+                    </button>
+                    <button className="w-full text-left p-2 bg-gray-50 hover:bg-gray-100 rounded-md text-sm border border-gray-200 transition-colors">
+                      "I'd be happy to chat! Let me check my calendar and get back to you with some options."
+                    </button>
+                    <button className="w-full text-left p-2 bg-gray-50 hover:bg-gray-100 rounded-md text-sm border border-gray-200 transition-colors">
+                      "Definitely interested! Would a 15-minute call work, or do you prefer a longer discussion?"
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
