@@ -26,14 +26,14 @@ export default function UserAuth() {
           asChild
           className="text-muted-foreground hover:text-foreground"
         >
-          <Link href="/sign-in">Sign In</Link>
+          <Link href="/handler/sign-in/">Sign In</Link>
         </Button>
         <Button 
           size="sm"
           asChild
           className="bg-primary hover:bg-primary/90 text-primary-foreground"
         >
-          <Link href="/sign-up">Sign Up</Link>
+          <Link href="/handler/sign-up/">Sign Up</Link>
         </Button>
       </div>
     )
