@@ -14,12 +14,14 @@ export default function WelcomePage() {
       <header className="border-b border-border bg-background">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Brain className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">
-              SocialScribe+
-            </span>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Brain className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-semibold text-foreground">
+                SocialScribe
+              </span>
+            </Link>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -38,13 +40,13 @@ export default function WelcomePage() {
             <CheckCircle className="h-4 w-4" />
             Successfully Installed!
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             Welcome to SocialScribe+! 🎉
           </h1>
-          
+
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Your AI writing assistant is ready to help you write better content across every website. 
+            Your AI writing assistant is ready to help you write better content across every website.
             Let's get you started with a quick tour!
           </p>
 
@@ -73,7 +75,7 @@ export default function WelcomePage() {
             <h3 className="text-2xl font-bold text-foreground mb-2">50K+</h3>
             <p className="text-muted-foreground">Happy Users</p>
           </div>
-          
+
           <div className="text-center p-6 bg-card rounded-lg border border-border">
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Zap className="h-6 w-6 text-green-600" />
@@ -81,7 +83,7 @@ export default function WelcomePage() {
             <h3 className="text-2xl font-bold text-foreground mb-2">1M+</h3>
             <p className="text-muted-foreground">Texts Improved</p>
           </div>
-          
+
           <div className="text-center p-6 bg-card rounded-lg border border-border">
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
               <Star className="h-6 w-6 text-purple-600" />
@@ -96,7 +98,7 @@ export default function WelcomePage() {
           <h2 className="text-3xl font-bold text-foreground text-center mb-12">
             How to Use SocialScribe+
           </h2>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="flex gap-4">
@@ -110,7 +112,7 @@ export default function WelcomePage() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-4">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-sm">
                   2
@@ -122,7 +124,7 @@ export default function WelcomePage() {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-4">
                 <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-sm">
                   3
@@ -135,7 +137,7 @@ export default function WelcomePage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-muted/30 rounded-lg p-6 border border-border">
               <h3 className="font-semibold text-foreground mb-4">💡 Pro Tips</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
@@ -165,7 +167,7 @@ export default function WelcomePage() {
           <h2 className="text-3xl font-bold text-foreground text-center mb-8">
             Works Everywhere You Write
           </h2>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { icon: Twitter, name: "Twitter/X", color: "text-blue-500" },
@@ -193,7 +195,7 @@ export default function WelcomePage() {
               Your Privacy is Protected
             </h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              SocialScribe+ processes your text securely and doesn't store any of your content. 
+              SocialScribe+ processes your text securely and doesn't store any of your content.
               Your writing stays private, and we only improve it with AI magic.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm">
@@ -221,7 +223,7 @@ export default function WelcomePage() {
           <p className="text-xl text-muted-foreground mb-8">
             Start using SocialScribe+ on any website with text fields!
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/#demo">

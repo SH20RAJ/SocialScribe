@@ -13,12 +13,14 @@ export default function UninstallPage() {
       <header className="border-b border-border bg-background">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Brain className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">
-              SocialScribe+
-            </span>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <Brain className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="text-xl font-semibold text-foreground">
+                SocialScribe
+              </span>
+            </Link>
           </div>
           <UserAuth />
         </div>
@@ -30,13 +32,13 @@ export default function UninstallPage() {
           <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart className="h-10 w-10 text-orange-500" />
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             We're Sad to See You Go 💔
           </h1>
-          
+
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Thank you for trying SocialScribe+. We'd love to know what we could have done better 
+            Thank you for trying SocialScribe+. We'd love to know what we could have done better
             to make your writing experience amazing.
           </p>
         </div>
@@ -47,7 +49,7 @@ export default function UninstallPage() {
             <h2 className="text-2xl font-bold text-foreground text-center mb-6">
               Help Us Improve 🚀
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="space-y-4">
                 <h3 className="font-semibold text-foreground mb-4">Why did you uninstall?</h3>
@@ -63,9 +65,9 @@ export default function UninstallPage() {
                     "Other reason"
                   ].map((reason, index) => (
                     <label key={index} className="flex items-center gap-3 cursor-pointer">
-                      <input 
-                        type="radio" 
-                        name="uninstall-reason" 
+                      <input
+                        type="radio"
+                        name="uninstall-reason"
                         value={reason}
                         className="w-4 h-4 text-primary border-border focus:ring-primary"
                       />
@@ -74,14 +76,14 @@ export default function UninstallPage() {
                   ))}
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold text-foreground mb-4">Additional feedback (optional)</h3>
-                <textarea 
+                <textarea
                   className="w-full h-32 p-3 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground resize-none"
                   placeholder="Tell us what we could improve..."
                 ></textarea>
-                
+
                 <Button className="w-full mt-4 bg-primary hover:bg-primary/90 text-primary-foreground">
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Send Feedback
@@ -96,7 +98,7 @@ export default function UninstallPage() {
           <h2 className="text-3xl font-bold text-foreground text-center mb-8">
             What You'll Miss
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center p-6 bg-card rounded-lg border border-border">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -107,7 +109,7 @@ export default function UninstallPage() {
                 Smart grammar fixes and tone adjustments across all websites
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-card rounded-lg border border-border">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Star className="h-6 w-6 text-green-600" />
@@ -117,7 +119,7 @@ export default function UninstallPage() {
                 Professional, casual, flirty, and custom tones for any situation
               </p>
             </div>
-            
+
             <div className="text-center p-6 bg-card rounded-lg border border-border">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <RefreshCw className="h-6 w-6 text-purple-600" />
@@ -136,7 +138,7 @@ export default function UninstallPage() {
             <h2 className="text-2xl font-bold text-foreground text-center mb-6">
               Before You Go... 🤔
             </h2>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <h3 className="font-semibold text-foreground mb-4">Having Issues?</h3>
@@ -159,7 +161,7 @@ export default function UninstallPage() {
                   </li>
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="font-semibold text-foreground mb-4">Want to Try Again?</h3>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -182,10 +184,10 @@ export default function UninstallPage() {
             Thank You! 🙏
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            We appreciate you trying SocialScribe+. Your feedback helps us build better tools 
+            We appreciate you trying SocialScribe+. Your feedback helps us build better tools
             for writers everywhere. Best of luck with your writing journey!
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/">
