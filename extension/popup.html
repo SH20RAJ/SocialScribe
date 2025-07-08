@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SocialScribe+</title>
+  <title>SocialScribe</title>
   <style>
     * {
       margin: 0;
@@ -12,193 +12,306 @@
     }
 
     body {
-      width: 350px;
+      width: 380px;
+      min-height: 500px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: #ffffff;
+      color: #1f2937;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
     .header {
-      padding: 20px;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      background: #ffffff;
     }
 
     .logo {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       margin-bottom: 8px;
     }
 
-    .logo svg {
+    .logo-icon {
       width: 24px;
       height: 24px;
-    }
-
-    .logo h1 {
-      font-size: 20px;
-      font-weight: 700;
-    }
-
-    .tagline {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    .content {
-      padding: 20px;
-    }
-
-    .feature {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .feature:last-child {
-      border-bottom: none;
-    }
-
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
+      background: #1f2937;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-    }
-
-    .feature-text h3 {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .feature-text p {
+      color: white;
       font-size: 12px;
-      opacity: 0.8;
+      font-weight: 600;
     }
 
-    .status {
+    .logo-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .main {
+      padding: 20px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #1f2937;
+      margin-bottom: 12px;
+    }
+
+    .textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.4;
+      resize: vertical;
+      font-family: inherit;
+      background: #ffffff;
+      transition: border-color 0.2s;
+    }
+
+    .textarea:focus {
+      outline: none;
+      border-color: #6b7280;
+    }
+
+    .textarea::placeholder {
+      color: #9ca3af;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid #d1d5db;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .chip:hover {
+      border-color: #9ca3af;
+      background: #f9fafb;
+    }
+
+    .chip.active {
+      background: #1f2937;
+      color: #ffffff;
+      border-color: #1f2937;
+    }
+
+    .button {
+      width: 100%;
+      padding: 12px 16px;
+      background: #1f2937;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-family: inherit;
+    }
+
+    .button:hover:not(:disabled) {
+      background: #111827;
+    }
+
+    .button:disabled {
+      background: #d1d5db;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .button-secondary {
+      background: #ffffff;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .button-secondary:hover:not(:disabled) {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .result {
       margin-top: 16px;
       padding: 12px;
-      background: rgba(255, 255, 255, 0.1);
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
       border-radius: 8px;
-      text-align: center;
+      font-size: 13px;
+      line-height: 1.4;
+      min-height: 60px;
+      white-space: pre-wrap;
     }
 
-    .status-active {
-      background: rgba(34, 197, 94, 0.2);
+    .result.loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
     }
 
-    .status h4 {
-      font-size: 14px;
-      margin-bottom: 4px;
+    .copy-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
     }
 
-    .status p {
-      font-size: 12px;
-      opacity: 0.8;
+    .copy-button {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: #ffffff;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .copy-button:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .copy-button.copied {
+      background: #1f2937;
+      color: #ffffff;
+      border-color: #1f2937;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e5e7eb;
+      border-top: 2px solid #6b7280;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .footer {
       padding: 16px 20px;
+      border-top: 1px solid #e5e7eb;
+      background: #f9fafb;
       text-align: center;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .footer a {
-      color: white;
+    .footer-text {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .footer-link {
+      color: #1f2937;
       text-decoration: none;
-      font-size: 12px;
-      opacity: 0.8;
+      font-weight: 500;
     }
 
-    .footer a:hover {
-      opacity: 1;
-    }
-
-    .settings-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-      margin-top: 12px;
-    }
-
-    .settings-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
+    .footer-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="header">
     <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
-        <path d="M19 15L20.09 18.26L23 19L20.09 19.74L19 23L17.91 19.74L15 19L17.91 18.26L19 15Z" fill="currentColor"/>
-        <path d="M5 6L6.09 9.26L9 10L6.09 10.74L5 14L3.91 10.74L1 10L3.91 9.26L5 6Z" fill="currentColor"/>
-      </svg>
-      <h1>SocialScribe+</h1>
+      <div class="logo-icon">S</div>
+      <div class="logo-text">SocialScribe</div>
     </div>
-    <p class="tagline">AI-powered writing assistant</p>
+    <div class="subtitle">AI-powered writing assistant</div>
   </div>
 
-  <div class="content">
-    <div class="feature">
-      <div class="feature-icon">✓</div>
-      <div class="feature-text">
-        <h3>Grammar Fixer</h3>
-        <p>Fix grammar and spelling instantly</p>
+  <div class="main">
+    <div class="section">
+      <div class="section-title">Your text</div>
+      <textarea 
+        id="inputText" 
+        class="textarea" 
+        placeholder="Type or paste your text here..."
+      ></textarea>
+    </div>
+
+    <div class="section">
+      <div class="section-title">What would you like to do?</div>
+      <div class="chips" id="actionChips">
+        <div class="chip active" data-value="fix_grammar">Fix Grammar</div>
+        <div class="chip" data-value="rewrite">Rewrite</div>
+        <div class="chip" data-value="shorten">Shorten</div>
+        <div class="chip" data-value="expand">Expand</div>
+        <div class="chip" data-value="formalize">Formalize</div>
       </div>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">✍️</div>
-      <div class="feature-text">
-        <h3>Tone Rewriter</h3>
-        <p>Rewrite in any tone you need</p>
+    <div class="section">
+      <div class="section-title">Choose tone</div>
+      <div class="chips" id="toneChips">
+        <div class="chip" data-value="formal">Formal</div>
+        <div class="chip active" data-value="professional">Professional</div>
+        <div class="chip" data-value="friendly">Friendly</div>
+        <div class="chip" data-value="casual">Casual</div>
+        <div class="chip" data-value="confident">Confident</div>
+        <div class="chip" data-value="persuasive">Persuasive</div>
       </div>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">🌐</div>
-      <div class="feature-text">
-        <h3>Works Everywhere</h3>
-        <p>Twitter, LinkedIn, Gmail, and more</p>
-      </div>
+    <div class="section">
+      <div class="section-title">Custom instructions (optional)</div>
+      <textarea 
+        id="customInstructions" 
+        class="textarea" 
+        placeholder="Add specific instructions..."
+        style="min-height: 60px;"
+      ></textarea>
     </div>
 
-    <div class="feature">
-      <div class="feature-icon">⚡</div>
-      <div class="feature-text">
-        <h3>Keyboard Shortcut</h3>
-        <p>Press Cmd/Ctrl + Shift + G</p>
-      </div>
-    </div>
+    <button id="rewriteBtn" class="button">Rewrite text</button>
 
-    <div class="status status-active">
-      <h4>🟢 Extension Active</h4>
-      <p>Ready to help improve your writing</p>
+    <div id="result" class="result" style="display: none;"></div>
+    <div id="copyButtons" class="copy-buttons" style="display: none;">
+      <button id="copyText" class="copy-button">Copy Text</button>
+      <button id="copyMarkdown" class="copy-button">Copy MD</button>
     </div>
-
-    <button class="settings-btn" id="settingsBtn">⚙️ Settings</button>
   </div>
 
   <div class="footer">
-    <a href="https://socialscribe.pages.dev" target="_blank">
-      Visit SocialScribe+ Website
-    </a>
+    <div class="footer-text">
+      Powered by AI • <a href="#" class="footer-link" id="openWebApp">Open Web App</a>
+    </div>
   </div>
 
   <script src="popup.js"></script>

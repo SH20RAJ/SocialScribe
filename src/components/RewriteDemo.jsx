@@ -3,8 +3,9 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Copy, Check, Sparkles, X } from "lucide-react"
+import { Loader2, Copy, Check, Sparkles, X, FileText, Type } from "lucide-react"
 import { tones, actions } from "@/lib/utils"
+import { marked } from 'marked'
 
 export default function RewriteDemo() {
   const [inputText, setInputText] = useState("")
@@ -14,6 +15,7 @@ export default function RewriteDemo() {
   const [customInstructions, setCustomInstructions] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [copyType, setCopyType] = useState("")
 
   const handleRewrite = async () => {
     if (!inputText.trim()) return
@@ -72,14 +74,47 @@ export default function RewriteDemo() {
     }
   }
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (type = 'text') => {
     try {
-      await navigator.clipboard.writeText(outputText)
+      let textToCopy = outputText
+      
+      if (type === 'text') {
+        // Remove markdown formatting
+        textToCopy = outputText
+          .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+          .replace(/\*(.*?)\*/g, '$1') // Italic
+          .replace(/`(.*?)`/g, '$1') // Inline code
+          .replace(/#{1,6}\s/g, '') // Headers
+          .replace(/^\s*[-*+]\s/gm, '') // List items
+          .replace(/^\s*\d+\.\s/gm, '') // Numbered lists
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+          .replace(/^\s*>\s/gm, '') // Blockquotes
+          .trim()
+      }
+      
+      await navigator.clipboard.writeText(textToCopy)
+      setCopyType(type)
       setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setTimeout(() => {
+        setCopied(false)
+        setCopyType("")
+      }, 2000)
     } catch (err) {
       console.error('Failed to copy text: ', err)
     }
+  }
+
+  // Convert markdown to HTML for display
+  const getFormattedOutput = () => {
+    if (!outputText) return ""
+    
+    // Configure marked for safe HTML
+    marked.setOptions({
+      breaks: true,
+      gfm: true
+    })
+    
+    return marked(outputText)
   }
 
   const clearAll = () => {
@@ -87,6 +122,7 @@ export default function RewriteDemo() {
     setOutputText("")
     setCustomInstructions("")
     setCopied(false)
+    setCopyType("")
   }
 
   return (
@@ -211,24 +247,44 @@ export default function RewriteDemo() {
                 Improved text
               </label>
               {outputText && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={copyToClipboard}
-                  className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-50"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="h-3 w-3" />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" />
-                      Copy
-                    </>
-                  )}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard('text')}
+                    className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    {copied && copyType === 'text' ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Type className="h-3 w-3" />
+                        Copy Text
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => copyToClipboard('markdown')}
+                    className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    {copied && copyType === 'markdown' ? (
+                      <>
+                        <Check className="h-3 w-3" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <FileText className="h-3 w-3" />
+                        Copy MD
+                      </>
+                    )}
+                  </Button>
+                </div>
               )}
             </div>
             
@@ -240,7 +296,10 @@ export default function RewriteDemo() {
                 </div>
               ) : outputText ? (
                 <div className="space-y-4">
-                  <p className="whitespace-pre-wrap text-sm text-gray-900 leading-relaxed">{outputText}</p>
+                  <div 
+                    className="prose prose-sm max-w-none text-gray-900 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: getFormattedOutput() }}
+                  />
                   <div className="pt-3 border-t border-gray-200">
                     <p className="text-xs text-gray-500">
                       Action: {actions.find(a => a.value === selectedAction)?.label} - 

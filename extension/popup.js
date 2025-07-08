@@ -1,86 +1,235 @@
-// SocialScribe+ Popup Script
+// Extension popup functionality
+let selectedAction = 'fix_grammar'
+let selectedTone = 'professional'
+let isLoading = false
+let outputText = ''
 
+// Initialize popup
 document.addEventListener('DOMContentLoaded', function() {
-  // Load settings
-  loadSettings()
-  
-  // Settings button
-  document.getElementById('settingsBtn').addEventListener('click', function() {
-    chrome.tabs.create({ url: 'https://socialscribe.pages.dev' })
-  })
-  
-  // Check if extension is working on current tab
-  checkExtensionStatus()
+  initializeChips()
+  initializeButtons()
+  loadSavedData()
 })
 
-function loadSettings() {
-  chrome.storage.sync.get(['socialscribeSettings'], function(result) {
-    const settings = result.socialscribeSettings || {
-      enabled: true,
-      autoSuggest: true,
-      keyboardShortcuts: true
-    }
-    
-    // Update UI based on settings
-    updateStatusDisplay(settings.enabled)
+function initializeChips() {
+  // Action chips
+  const actionChips = document.querySelectorAll('#actionChips .chip')
+  actionChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      actionChips.forEach(c => c.classList.remove('active'))
+      chip.classList.add('active')
+      selectedAction = chip.dataset.value
+      saveData()
+    })
   })
-}
 
-function updateStatusDisplay(enabled) {
-  const statusElement = document.querySelector('.status')
-  const statusTitle = statusElement.querySelector('h4')
-  const statusText = statusElement.querySelector('p')
-  
-  if (enabled) {
-    statusElement.classList.add('status-active')
-    statusTitle.textContent = '🟢 Extension Active'
-    statusText.textContent = 'Ready to help improve your writing'
-  } else {
-    statusElement.classList.remove('status-active')
-    statusTitle.textContent = '🔴 Extension Disabled'
-    statusText.textContent = 'Click to enable writing assistance'
-  }
-}
-
-function checkExtensionStatus() {
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    const currentTab = tabs[0]
-    
-    if (!currentTab) return
-    
-    // Check if we can inject scripts on this page
-    const url = currentTab.url
-    if (url.startsWith('chrome://') || url.startsWith('chrome-extension://') || url.startsWith('moz-extension://')) {
-      updateStatusDisplay(false)
-      const statusElement = document.querySelector('.status')
-      const statusTitle = statusElement.querySelector('h4')
-      const statusText = statusElement.querySelector('p')
-      
-      statusTitle.textContent = '⚠️ Not Available'
-      statusText.textContent = 'Extension cannot run on this page'
-      return
-    }
-    
-    // Try to communicate with content script
-    chrome.tabs.sendMessage(currentTab.id, { action: 'ping' }, function(response) {
-      if (chrome.runtime.lastError) {
-        // Content script not loaded, try to inject it
-        chrome.scripting.executeScript({
-          target: { tabId: currentTab.id },
-          files: ['content.js']
-        }, function() {
-          if (chrome.runtime.lastError) {
-            console.error('Failed to inject content script:', chrome.runtime.lastError)
-          }
-        })
-      }
+  // Tone chips
+  const toneChips = document.querySelectorAll('#toneChips .chip')
+  toneChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      toneChips.forEach(c => c.classList.remove('active'))
+      chip.classList.add('active')
+      selectedTone = chip.dataset.value
+      saveData()
     })
   })
 }
 
-// Listen for messages from content script
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === 'updateStatus') {
-    updateStatusDisplay(request.enabled)
+function initializeButtons() {
+  // Rewrite button
+  document.getElementById('rewriteBtn').addEventListener('click', handleRewrite)
+  
+  // Copy buttons
+  document.getElementById('copyText').addEventListener('click', () => copyToClipboard('text'))
+  document.getElementById('copyMarkdown').addEventListener('click', () => copyToClipboard('markdown'))
+  
+  // Open web app
+  document.getElementById('openWebApp').addEventListener('click', () => {
+    chrome.tabs.create({ url: 'https://socialscribe.pages.dev' })
+  })
+
+  // Auto-save input
+  document.getElementById('inputText').addEventListener('input', saveData)
+  document.getElementById('customInstructions').addEventListener('input', saveData)
+}
+
+async function handleRewrite() {
+  const inputText = document.getElementById('inputText').value.trim()
+  const customInstructions = document.getElementById('customInstructions').value.trim()
+  
+  if (!inputText) {
+    showError('Please enter some text to rewrite')
+    return
   }
-})
+
+  setLoading(true)
+  
+  try {
+    const response = await fetch('https://socialscribe.pages.dev/api/rewrite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: inputText,
+        action: selectedAction,
+        tone: selectedTone,
+        platform: 'general',
+        customInstructions: customInstructions
+      }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to rewrite text')
+    }
+
+    const reader = response.body.getReader()
+    const decoder = new TextDecoder()
+    outputText = ''
+
+    // Show result container
+    document.getElementById('result').style.display = 'block'
+    document.getElementById('result').textContent = ''
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      const chunk = decoder.decode(value)
+      const lines = chunk.split('\n')
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6)
+          try {
+            const parsed = JSON.parse(data)
+            if (parsed.content) {
+              outputText += parsed.content
+              // Convert markdown to plain text for display in extension
+              const plainText = convertMarkdownToPlainText(outputText)
+              document.getElementById('result').textContent = plainText
+            }
+          } catch (e) {
+            // Skip invalid JSON
+          }
+        }
+      }
+    }
+
+    // Show copy buttons
+    document.getElementById('copyButtons').style.display = 'flex'
+    
+  } catch (error) {
+    console.error('Error:', error)
+    showError('Sorry, there was an error processing your request. Please try again.')
+  } finally {
+    setLoading(false)
+  }
+}
+
+function convertMarkdownToPlainText(markdown) {
+  return markdown
+    .replace(/\*\*(.*?)\*\*/g, '$1') // Bold
+    .replace(/\*(.*?)\*/g, '$1') // Italic
+    .replace(/`(.*?)`/g, '$1') // Inline code
+    .replace(/#{1,6}\s/g, '') // Headers
+    .replace(/^\s*[-*+]\s/gm, '') // List items
+    .replace(/^\s*\d+\.\s/gm, '') // Numbered lists
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+    .replace(/^\s*>\s/gm, '') // Blockquotes
+    .trim()
+}
+
+async function copyToClipboard(type) {
+  try {
+    let textToCopy = outputText
+    
+    if (type === 'text') {
+      textToCopy = convertMarkdownToPlainText(outputText)
+    }
+    
+    await navigator.clipboard.writeText(textToCopy)
+    
+    // Visual feedback
+    const button = type === 'text' ? document.getElementById('copyText') : document.getElementById('copyMarkdown')
+    const originalText = button.textContent
+    button.textContent = 'Copied!'
+    button.classList.add('copied')
+    
+    setTimeout(() => {
+      button.textContent = originalText
+      button.classList.remove('copied')
+    }, 2000)
+    
+  } catch (err) {
+    console.error('Failed to copy text: ', err)
+    showError('Failed to copy text')
+  }
+}
+
+function setLoading(loading) {
+  isLoading = loading
+  const btn = document.getElementById('rewriteBtn')
+  const result = document.getElementById('result')
+  
+  if (loading) {
+    btn.disabled = true
+    btn.innerHTML = '<div class="spinner"></div> Rewriting...'
+    result.style.display = 'block'
+    result.className = 'result loading'
+    result.innerHTML = '<div class="spinner"></div>'
+    document.getElementById('copyButtons').style.display = 'none'
+  } else {
+    btn.disabled = false
+    btn.textContent = 'Rewrite text'
+    result.className = 'result'
+  }
+}
+
+function showError(message) {
+  const result = document.getElementById('result')
+  result.style.display = 'block'
+  result.className = 'result'
+  result.textContent = message
+  result.style.color = '#dc2626'
+  document.getElementById('copyButtons').style.display = 'none'
+}
+
+function saveData() {
+  const data = {
+    inputText: document.getElementById('inputText').value,
+    customInstructions: document.getElementById('customInstructions').value,
+    selectedAction,
+    selectedTone
+  }
+  chrome.storage.local.set(data)
+}
+
+function loadSavedData() {
+  chrome.storage.local.get(['inputText', 'customInstructions', 'selectedAction', 'selectedTone'], (result) => {
+    if (result.inputText) {
+      document.getElementById('inputText').value = result.inputText
+    }
+    if (result.customInstructions) {
+      document.getElementById('customInstructions').value = result.customInstructions
+    }
+    if (result.selectedAction) {
+      selectedAction = result.selectedAction
+      updateActiveChip('#actionChips', selectedAction)
+    }
+    if (result.selectedTone) {
+      selectedTone = result.selectedTone
+      updateActiveChip('#toneChips', selectedTone)
+    }
+  })
+}
+
+function updateActiveChip(container, value) {
+  const chips = document.querySelectorAll(`${container} .chip`)
+  chips.forEach(chip => {
+    chip.classList.remove('active')
+    if (chip.dataset.value === value) {
+      chip.classList.add('active')
+    }
+  })
+}
