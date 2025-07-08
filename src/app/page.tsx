@@ -25,7 +25,7 @@ export default function Home() {
               Features
             </Link>
             <Link href="#demo" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
-              Demo
+              Rewriter
             </Link>
             <Link href="#install" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
               Install
@@ -66,7 +66,7 @@ export default function Home() {
             </Button>
             <Button size="lg" variant="outline" asChild className="border-gray-300 text-gray-700 hover:bg-gray-50">
               <Link href="#demo">
-                Try Demo
+                Try Rewriter
               </Link>
             </Button>
           </div>
@@ -144,12 +144,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Demo Section */}
+      {/* AI Rewriter Section */}
       <section id="demo" className="py-20 px-6 bg-white">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900">Try it now</h2>
-            <p className="text-gray-600">See how SocialScribe can improve your writing</p>
+            <h2 className="text-3xl font-bold mb-4 text-gray-900">AI Text Rewriter</h2>
+            <p className="text-gray-600">Improve your writing instantly with AI-powered suggestions</p>
           </div>
           
           <RewriteDemo />

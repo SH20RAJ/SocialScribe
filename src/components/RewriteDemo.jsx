@@ -3,15 +3,15 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, Copy, Check } from "lucide-react"
+import { Loader2, Copy, Check, Sparkles, X } from "lucide-react"
 import { tones, actions } from "@/lib/utils"
 
 export default function RewriteDemo() {
-  const [inputText, setInputText] = useState("hey can you help me with this thing? its really important and i need it done asap. thanks!")
+  const [inputText, setInputText] = useState("")
   const [outputText, setOutputText] = useState("")
   const [selectedAction, setSelectedAction] = useState("fix_grammar")
   const [selectedTone, setSelectedTone] = useState("professional")
+  const [customInstructions, setCustomInstructions] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -31,7 +31,8 @@ export default function RewriteDemo() {
           text: inputText,
           action: selectedAction,
           tone: selectedTone,
-          platform: 'general'
+          platform: 'general',
+          customInstructions: customInstructions
         }),
       })
 
@@ -81,105 +82,181 @@ export default function RewriteDemo() {
     }
   }
 
+  const clearAll = () => {
+    setInputText("")
+    setOutputText("")
+    setCustomInstructions("")
+    setCopied(false)
+  }
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Input Section */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900">Original text</h3>
-          <Textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="Type or paste your text here..."
-            className="min-h-[120px] border-gray-200 focus:border-gray-400 focus:ring-0"
-          />
-          
-          <div className="grid grid-cols-2 gap-3">
+    <div className="bg-white rounded-lg border border-gray-200">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-gray-700" />
+            <h2 className="text-lg font-semibold text-gray-900">AI Text Rewriter</h2>
+          </div>
+          {(inputText || outputText || customInstructions) && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={clearAll}
+              className="border-gray-200 text-gray-600 hover:bg-gray-50"
+            >
+              <X className="h-3 w-3 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+        <p className="text-sm text-gray-600 mt-1">
+          Improve your writing with AI-powered suggestions
+        </p>
+      </div>
+
+      <div className="p-6">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Input Section */}
+          <div className="space-y-6">
             <div>
-              <label className="text-xs font-medium mb-2 block text-gray-700">Action</label>
-              <Select value={selectedAction} onValueChange={setSelectedAction}>
-                <SelectTrigger className="border-gray-200 focus:border-gray-400 focus:ring-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {actions.map((action) => (
-                    <SelectItem key={action.value} value={action.value}>
-                      {action.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium text-gray-900 mb-3 block">
+                Your text
+              </label>
+              <Textarea
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Type or paste your text here..."
+                className="min-h-[140px] border-gray-200 focus:border-gray-400 focus:ring-0 resize-none"
+              />
+            </div>
+
+            {/* Action Chips */}
+            <div>
+              <label className="text-sm font-medium text-gray-900 mb-3 block">
+                What would you like to do?
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {actions.map((action) => (
+                  <button
+                    key={action.value}
+                    onClick={() => setSelectedAction(action.value)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+                      selectedAction === action.value
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {action.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tone Chips */}
+            <div>
+              <label className="text-sm font-medium text-gray-900 mb-3 block">
+                Choose tone
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {tones.map((tone) => (
+                  <button
+                    key={tone.value}
+                    onClick={() => setSelectedTone(tone.value)}
+                    className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+                      selectedTone === tone.value
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    {tone.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Instructions */}
+            <div>
+              <label className="text-sm font-medium text-gray-900 mb-3 block">
+                Custom instructions (optional)
+              </label>
+              <Textarea
+                value={customInstructions}
+                onChange={(e) => setCustomInstructions(e.target.value)}
+                placeholder="Add specific instructions like 'make it more persuasive for LinkedIn' or 'add technical details'..."
+                className="min-h-[80px] border-gray-200 focus:border-gray-400 focus:ring-0 resize-none"
+              />
             </div>
             
-            <div>
-              <label className="text-xs font-medium mb-2 block text-gray-700">Tone</label>
-              <Select value={selectedTone} onValueChange={setSelectedTone}>
-                <SelectTrigger className="border-gray-200 focus:border-gray-400 focus:ring-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {tones.map((tone) => (
-                    <SelectItem key={tone.value} value={tone.value}>
-                      {tone.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <Button 
+              onClick={handleRewrite} 
+              disabled={isLoading || !inputText.trim()}
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white border-0"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Rewriting...
+                </>
+              ) : (
+                'Rewrite text'
+              )}
+            </Button>
           </div>
-          
-          <Button 
-            onClick={handleRewrite} 
-            disabled={isLoading || !inputText.trim()}
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white border-0"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Rewriting...
-              </>
-            ) : (
-              'Rewrite text'
-            )}
-          </Button>
-        </div>
 
-        {/* Output Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-900">Improved text</h3>
-            {outputText && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={copyToClipboard}
-                className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-50"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-3 w-3" />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3 w-3" />
-                    Copy
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-          
-          <div className="min-h-[120px] p-4 border border-gray-200 rounded-lg bg-gray-50">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-600" />
-              </div>
-            ) : outputText ? (
-              <p className="whitespace-pre-wrap text-sm text-gray-900 leading-relaxed">{outputText}</p>
-            ) : (
-              <p className="text-gray-500 text-sm">Your improved text will appear here...</p>
-            )}
+          {/* Output Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-900">
+                Improved text
+              </label>
+              {outputText && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyToClipboard}
+                  className="flex items-center gap-2 border-gray-200 text-gray-700 hover:bg-gray-50"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-3 w-3" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+            
+            <div className="min-h-[300px] p-4 border border-gray-200 rounded-lg bg-gray-50">
+              {isLoading ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                  <Loader2 className="h-6 w-6 animate-spin text-gray-600 mb-2" />
+                  <p className="text-sm text-gray-600">AI is working on your text...</p>
+                </div>
+              ) : outputText ? (
+                <div className="space-y-4">
+                  <p className="whitespace-pre-wrap text-sm text-gray-900 leading-relaxed">{outputText}</p>
+                  <div className="pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-500">
+                      Action: {actions.find(a => a.value === selectedAction)?.label} - 
+                      Tone: {tones.find(t => t.value === selectedTone)?.label}
+                      {customInstructions && " - Custom instructions applied"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <Sparkles className="h-8 w-8 text-gray-400 mb-3" />
+                  <p className="text-sm text-gray-500 mb-1">Your improved text will appear here</p>
+                  <p className="text-xs text-gray-400">Enter some text and click "Rewrite text" to get started</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

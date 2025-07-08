@@ -8,11 +8,12 @@ interface RequestBody {
   tone: string
   platform?: string
   context?: string
+  customInstructions?: string
 }
 
 export async function POST(request: Request) {
   try {
-    const { text, action, tone, platform, context }: RequestBody = await request.json()
+    const { text, action, tone, platform, context, customInstructions }: RequestBody = await request.json()
 
     if (!text) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 })
@@ -46,6 +47,10 @@ export async function POST(request: Request) {
 
     if (context) {
       prompt += `\n\nContext: ${context}`
+    }
+
+    if (customInstructions) {
+      prompt += `\n\nAdditional instructions: ${customInstructions}`
     }
 
     // Call OpenRouter API with better error handling
