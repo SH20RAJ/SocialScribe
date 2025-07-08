@@ -35,17 +35,23 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 })
 
-// Handle keyboard shortcuts (if available)
-if (chrome.commands && chrome.commands.onCommand) {
-  chrome.commands.onCommand.addListener((command) => {
-    if (command === 'fix-grammar') {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs[0].id, { 
-          action: 'fixGrammar' 
+// Handle keyboard shortcuts (wrapped in try-catch for safety)
+try {
+  if (typeof chrome !== 'undefined' && chrome.commands && chrome.commands.onCommand) {
+    chrome.commands.onCommand.addListener((command) => {
+      if (command === 'fix-grammar') {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs[0]) {
+            chrome.tabs.sendMessage(tabs[0].id, { 
+              action: 'fixGrammar' 
+            })
+          }
         })
-      })
-    }
-  })
+      }
+    })
+  }
+} catch (error) {
+  console.log('Commands API not available:', error)
 }
 
 // Handle messages from content scripts

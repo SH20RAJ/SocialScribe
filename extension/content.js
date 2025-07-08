@@ -14,6 +14,8 @@ class SocialScribeExtension {
     this.createFloatingButton()
     this.attachEventListeners()
     this.observeTextareas()
+    this.addIconsToExistingFields()
+    this.startObserver()
   }
 
   // Create the floating AI button
@@ -138,12 +140,15 @@ class SocialScribeExtension {
   }
 
   attachToTextInputs(container) {
-    const textInputs = container.querySelectorAll('textarea, input[type="text"], [contenteditable="true"]')
+    const textInputs = container.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="search"], [contenteditable="true"]')
     
     textInputs.forEach(input => {
       if (input.dataset.socialscribeAttached) return
       
       input.dataset.socialscribeAttached = 'true'
+      
+      // Add Grammarly-style icon to each field
+      this.addIconToElement(input)
       
       input.addEventListener('focus', (e) => {
         this.activeElement = e.target
@@ -338,6 +343,107 @@ class SocialScribeExtension {
       this.hideLoading()
       this.hidePopup()
     }
+  }
+
+  // Add SocialScribe icon to a specific element (Grammarly-style)
+  addIconToElement(element) {
+    // Skip if already has icon or is not visible
+    if (element.dataset.socialscribeIconAdded || !this.isElementVisible(element)) {
+      return
+    }
+
+    element.dataset.socialscribeIconAdded = 'true'
+    
+    // Create icon container
+    const iconContainer = document.createElement('div')
+    iconContainer.className = 'socialscribe-icon-container'
+    iconContainer.innerHTML = `
+      <div class="socialscribe-icon" title="SocialScribe+ AI Writing Assistant">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+        </svg>
+      </div>
+    `
+
+    // Position the icon
+    this.positionIcon(element, iconContainer)
+    
+    // Add click handler
+    iconContainer.addEventListener('click', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      this.activeElement = element
+      this.showPopup(element)
+    })
+
+    // Add focus/blur handlers to show/hide icon
+    element.addEventListener('focus', () => {
+      iconContainer.style.opacity = '1'
+      iconContainer.style.visibility = 'visible'
+    })
+
+    element.addEventListener('blur', () => {
+      setTimeout(() => {
+        if (document.activeElement !== iconContainer && !iconContainer.contains(document.activeElement)) {
+          iconContainer.style.opacity = '0.6'
+        }
+      }, 100)
+    })
+
+    // Show icon on hover
+    element.addEventListener('mouseenter', () => {
+      iconContainer.style.visibility = 'visible'
+      iconContainer.style.opacity = '0.8'
+    })
+
+    element.addEventListener('mouseleave', () => {
+      if (document.activeElement !== element) {
+        iconContainer.style.opacity = '0.6'
+      }
+    })
+
+    document.body.appendChild(iconContainer)
+  }
+
+  // Position icon relative to element (like Grammarly)
+  positionIcon(element, iconContainer) {
+    const updatePosition = () => {
+      if (!element.offsetParent) return // Element not visible
+      
+      const rect = element.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+      
+      iconContainer.style.position = 'absolute'
+      iconContainer.style.left = (rect.right - 25 + scrollLeft) + 'px'
+      iconContainer.style.top = (rect.bottom - 25 + scrollTop) + 'px'
+      iconContainer.style.zIndex = '10000'
+      iconContainer.style.opacity = '0.6'
+      iconContainer.style.visibility = 'hidden'
+      iconContainer.style.transition = 'opacity 0.2s ease'
+    }
+
+    updatePosition()
+    
+    // Update position on scroll and resize
+    const updateHandler = () => updatePosition()
+    window.addEventListener('scroll', updateHandler, { passive: true })
+    window.addEventListener('resize', updateHandler, { passive: true })
+    
+    // Store cleanup function
+    iconContainer._cleanup = () => {
+      window.removeEventListener('scroll', updateHandler)
+      window.removeEventListener('resize', updateHandler)
+    }
+  }
+
+  // Check if element is visible
+  isElementVisible(element) {
+    if (!element.offsetParent) return false
+    const rect = element.getBoundingClientRect()
+    return rect.width > 0 && rect.height > 0 && 
+           window.getComputedStyle(element).display !== 'none' &&
+           window.getComputedStyle(element).visibility !== 'hidden'
   }
 
   detectPlatform() {
