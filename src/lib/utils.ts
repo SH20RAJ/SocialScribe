@@ -50,8 +50,8 @@ export const platforms: PlatformOption[] = [
 ]
 
 export const actions: ActionOption[] = [
-  { value: "fix_grammar", label: "Fix Grammar", description: "Correct grammar and spelling" },
   { value: "rewrite", label: "Rewrite", description: "Rewrite in different tone" },
+  { value: "fix_grammar", label: "Fix Grammar", description: "Correct grammar and spelling" },
   { value: "shorten", label: "Shorten", description: "Make it more concise" },
   { value: "expand", label: "Expand", description: "Add more detail" },
   { value: "summarize", label: "Summarize", description: "Create a summary" },

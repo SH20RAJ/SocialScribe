@@ -12,6 +12,7 @@ export default function RewriteDemo() {
   const [outputText, setOutputText] = useState("")
   const [selectedAction, setSelectedAction] = useState("fix_grammar")
   const [selectedTone, setSelectedTone] = useState("professional")
+  const [customTone, setCustomTone] = useState("")
   const [customInstructions, setCustomInstructions] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [copied, setCopied] = useState(false)
@@ -32,7 +33,7 @@ export default function RewriteDemo() {
         body: JSON.stringify({
           text: inputText,
           action: selectedAction,
-          tone: selectedTone,
+          tone: selectedTone === 'custom' ? customTone : selectedTone,
           platform: 'general',
           customInstructions: customInstructions
         }),
@@ -209,6 +210,18 @@ export default function RewriteDemo() {
                   </button>
                 ))}
               </div>
+              
+              {/* Custom Tone Input */}
+              {selectedTone === 'custom' && (
+                <div className="mt-3">
+                  <Textarea
+                    value={customTone}
+                    onChange={(e) => setCustomTone(e.target.value)}
+                    placeholder="Describe your custom tone (e.g., 'witty and professional', 'warm but authoritative', 'playful yet informative')..."
+                    className="min-h-[60px] border-gray-200 focus:border-gray-400 focus:ring-0 resize-none"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Custom Instructions */}
@@ -303,7 +316,7 @@ export default function RewriteDemo() {
                   <div className="pt-3 border-t border-gray-200">
                     <p className="text-xs text-gray-500">
                       Action: {actions.find(a => a.value === selectedAction)?.label} - 
-                      Tone: {tones.find(t => t.value === selectedTone)?.label}
+                      Tone: {selectedTone === 'custom' ? customTone || 'Custom' : tones.find(t => t.value === selectedTone)?.label}
                       {customInstructions && " - Custom instructions applied"}
                     </p>
                   </div>

@@ -30,19 +30,19 @@ export async function POST(request: Request) {
         prompt = `Rewrite the text in a ${tone} tone${platform ? ` for ${platform}` : ''}. Keep the meaning intact. Return only the rewritten version:\n\n"${text}"`;
         break;
       case 'shorten':
-        prompt = `Shorten this text to be more concise while preserving the core message. Return only the shortened version:\n\n"${text}"`;
+        prompt = `Make this text shorter and more concise${tone && tone !== 'professional' ? ` while maintaining a ${tone} tone` : ''}. Return only the shortened version:\n\n"${text}"`;
         break;
       case 'expand':
-        prompt = `Expand this text with more detail and context. Return only the expanded version:\n\n"${text}"`;
+        prompt = `Expand this text with more detail and context${tone && tone !== 'professional' ? ` in a ${tone} tone` : ''}. Return only the expanded version:\n\n"${text}"`;
         break;
       case 'summarize':
-        prompt = `Summarize this text clearly and concisely. Return only the summary:\n\n"${text}"`;
+        prompt = `Create a concise summary${tone && tone !== 'professional' ? ` in a ${tone} tone` : ''}. Return only the summary:\n\n"${text}"`;
         break;
       case 'formalize':
         prompt = `Make this text more formal and professional. Keep the original meaning. Return only the formal version:\n\n"${text}"`;
         break;
       default:
-        prompt = `Improve the clarity and effectiveness of this text. Return only the improved version:\n\n"${text}"`;
+        prompt = `Improve the clarity and effectiveness of this text${tone && tone !== 'professional' ? ` in a ${tone} tone` : ''}. Return only the improved version:\n\n"${text}"`;
     }
 
     const prefix = 'You are an AI writing assistant. Do not explain. Just return the result.';

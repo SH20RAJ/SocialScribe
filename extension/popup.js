@@ -25,14 +25,28 @@ function initializeChips() {
 
   // Tone chips
   const toneChips = document.querySelectorAll('#toneChips .chip')
+  const customToneSection = document.getElementById('customToneSection')
+  const customToneInput = document.getElementById('customTone')
+  
   toneChips.forEach(chip => {
     chip.addEventListener('click', () => {
       toneChips.forEach(c => c.classList.remove('active'))
       chip.classList.add('active')
       selectedTone = chip.dataset.value
+      
+      // Show/hide custom tone input
+      if (selectedTone === 'custom') {
+        customToneSection.style.display = 'block'
+      } else {
+        customToneSection.style.display = 'none'
+      }
+      
       saveData()
     })
   })
+  
+  // Custom tone input
+  customToneInput.addEventListener('input', saveData)
 }
 
 function initializeButtons() {
@@ -56,9 +70,16 @@ function initializeButtons() {
 async function handleRewrite() {
   const inputText = document.getElementById('inputText').value.trim()
   const customInstructions = document.getElementById('customInstructions').value.trim()
+  const customTone = document.getElementById('customTone').value.trim()
   
   if (!inputText) {
     showError('Please enter some text to rewrite')
+    return
+  }
+
+  // Validate custom tone if selected
+  if (selectedTone === 'custom' && !customTone) {
+    showError('Please describe your custom tone')
     return
   }
 
@@ -73,7 +94,7 @@ async function handleRewrite() {
       body: JSON.stringify({
         text: inputText,
         action: selectedAction,
-        tone: selectedTone,
+        tone: selectedTone === 'custom' ? customTone : selectedTone,
         platform: 'general',
         customInstructions: customInstructions
       }),
@@ -199,6 +220,7 @@ function saveData() {
   const data = {
     inputText: document.getElementById('inputText').value,
     customInstructions: document.getElementById('customInstructions').value,
+    customTone: document.getElementById('customTone').value,
     selectedAction,
     selectedTone
   }
@@ -206,12 +228,15 @@ function saveData() {
 }
 
 function loadSavedData() {
-  chrome.storage.local.get(['inputText', 'customInstructions', 'selectedAction', 'selectedTone'], (result) => {
+  chrome.storage.local.get(['inputText', 'customInstructions', 'customTone', 'selectedAction', 'selectedTone'], (result) => {
     if (result.inputText) {
       document.getElementById('inputText').value = result.inputText
     }
     if (result.customInstructions) {
       document.getElementById('customInstructions').value = result.customInstructions
+    }
+    if (result.customTone) {
+      document.getElementById('customTone').value = result.customTone
     }
     if (result.selectedAction) {
       selectedAction = result.selectedAction
@@ -220,6 +245,11 @@ function loadSavedData() {
     if (result.selectedTone) {
       selectedTone = result.selectedTone
       updateActiveChip('#toneChips', selectedTone)
+      
+      // Show custom tone section if custom is selected
+      if (selectedTone === 'custom') {
+        document.getElementById('customToneSection').style.display = 'block'
+      }
     }
   })
 }
