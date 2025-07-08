@@ -8,6 +8,17 @@ export const metadata = {
   description: 'AI-powered Chrome extension that fixes grammar, rewrites content, and enhances your writing across Twitter, LinkedIn, Gmail, and every website you visit.',
   keywords: 'AI writing assistant, grammar checker, content rewriter, Chrome extension, social media writing, DeepSeek AI',
   authors: [{ name: 'SocialScribe Team' }],
+  icons: {
+    icon: [
+      { url: '/icon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  themeColor: '#5854eb',
   openGraph: {
     title: 'SocialScribe+ - AI Writing Assistant',
     description: 'Write better everywhere with our AI-powered Chrome extension',

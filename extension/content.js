@@ -359,8 +359,12 @@ class SocialScribeExtension {
     iconContainer.className = 'socialscribe-icon-container'
     iconContainer.innerHTML = `
       <div class="socialscribe-icon" title="SocialScribe+ AI Writing Assistant">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-          <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 8V4l3 3-3 3V8z"/>
+          <path d="M8 12H4l3-3 3 3H8z"/>
+          <path d="M12 16v4l-3-3 3-3v2z"/>
+          <path d="M16 12h4l-3 3-3-3h2z"/>
+          <circle cx="12" cy="12" r="3"/>
         </svg>
       </div>
     `

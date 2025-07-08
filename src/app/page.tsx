@@ -25,8 +25,8 @@ export default function Home() {
             <Link href="#demo" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Rewriter
             </Link>
-            <Link href="#coming-soon" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              Coming Soon
+            <Link href="#faqs" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
+              FAQs
             </Link>
             <Link href="#install" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Install
@@ -310,8 +310,85 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FAQs Section */}
+      <section id="faqs" className="py-20 px-6 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Everything you need to know about SocialScribe+
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {[
+              {
+                question: "Is SocialScribe+ free to use?",
+                answer: "Yes! SocialScribe+ is completely free to download and use. There are no hidden fees, subscriptions, or premium features. All AI-powered writing assistance is available at no cost."
+              },
+              {
+                question: "Which websites does it work on?",
+                answer: "SocialScribe+ works on virtually every website with text input fields, including Twitter/X, LinkedIn, Gmail, Facebook, Reddit, Medium, Notion, Google Docs, and thousands of other sites. If there's a text box, SocialScribe+ can help improve your writing."
+              },
+              {
+                question: "Do I need to create an account?",
+                answer: "No account required! SocialScribe+ works immediately after installation. Your text is processed securely without requiring any personal information or sign-up process."
+              },
+              {
+                question: "Is my data safe and private?",
+                answer: "Absolutely. Your text is processed securely and we don't store or save any of your content. Each request is processed independently and your privacy is our top priority."
+              },
+              {
+                question: "What AI model powers SocialScribe+?",
+                answer: "SocialScribe+ uses advanced language models optimized for writing assistance. The AI is specifically trained to understand context, tone, and writing style to provide the most helpful suggestions."
+              },
+              {
+                question: "Can I use custom tones?",
+                answer: "Yes! In addition to preset tones like formal, casual, friendly, and professional, you can describe your own custom tone (e.g., 'witty and professional' or 'warm but authoritative') for personalized writing assistance."
+              },
+              {
+                question: "Does it work offline?",
+                answer: "SocialScribe+ requires an internet connection to process text through our AI models. However, the extension itself is installed locally and will work as soon as you're back online."
+              },
+              {
+                question: "How do I uninstall the extension?",
+                answer: "To uninstall, go to chrome://extensions/, find SocialScribe+ in your list of extensions, and click 'Remove'. All extension data will be completely removed from your browser."
+              },
+              {
+                question: "What's the difference between actions like 'Shorten' and 'Rewrite'?",
+                answer: "'Fix Grammar' corrects errors while keeping your original style. 'Rewrite' changes the tone and style. 'Shorten' makes text more concise. 'Expand' adds more detail. 'Summarize' creates a brief overview. Each action is optimized for different writing needs."
+              },
+              {
+                question: "Can I suggest new features?",
+                answer: "We'd love to hear your ideas! While we don't have a formal feedback system yet, we're constantly working to improve SocialScribe+ based on user needs and the latest AI capabilities."
+              }
+            ].map((faq, index) => (
+              <div key={index} className="bg-background rounded-lg border border-border p-6 hover:shadow-sm transition-shadow">
+                <h3 className="text-lg font-semibold text-foreground mb-3">
+                  {faq.question}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">
+                  {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <p className="text-muted-foreground mb-4">
+              Still have questions?
+            </p>
+            <p className="text-sm text-muted-foreground">
+              SocialScribe+ is designed to be intuitive and easy to use. Try the demo above or install the extension to get started!
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-gray-200 bg-white">
+      <footer className="py-12 px-6 border-t border-border bg-background">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
