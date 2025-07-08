@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
   "name": "SocialScribe+",
-  "version": "1.0.0",
-  "description": "AI-powered writing assistant that fixes grammar, rewrites content, and enhances your writing across all websites",
+  "version": "2.0.0",
+  "description": "AI-powered writing assistant that fixes grammar, rewrites content, and enhances your writing across all websites. Better than Grammarly.",
   "permissions": [
     "activeTab",
     "storage",
     "scripting",
-    "contextMenus"
+    "contextMenus",
+    "commands"
   ],
   "host_permissions": [
     "*://*.twitter.com/*",
@@ -16,11 +17,11 @@
     "*://*.gmail.com/*",
     "*://*.medium.com/*",
     "*://*.reddit.com/*",
-    "https://socialscribe.pages.dev/*",
     "*://*.facebook.com/*",
     "*://*.instagram.com/*",
     "*://*.notion.so/*",
     "*://*.docs.google.com/*",
+    "https://socialscribe.pages.dev/*",
     "http://*/*",
     "https://*/*"
   ],
@@ -32,7 +33,8 @@
       ],
       "js": ["content.js"],
       "css": ["content.css"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "all_frames": false
     }
   ],
   "background": {
@@ -40,7 +42,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "SocialScribe+",
+    "default_title": "SocialScribe+ - AI Writing Assistant",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
@@ -54,10 +56,40 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "commands": {
+    "open-socialscribe": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+S",
+        "mac": "Command+Shift+S"
+      },
+      "description": "Open SocialScribe quick panel"
+    },
+    "fix-grammar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+G",
+        "mac": "Command+Shift+G"
+      },
+      "description": "Fix grammar in selected text"
+    },
+    "rewrite-casual": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+C",
+        "mac": "Command+Shift+C"
+      },
+      "description": "Rewrite text in casual tone"
+    }
+  },
   "web_accessible_resources": [
     {
-      "resources": ["popup.html", "content.css"],
+      "resources": [
+        "content.css",
+        "icons/*.png"
+      ],
       "matches": ["<all_urls>"]
     }
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "minimum_chrome_version": "88"
 }

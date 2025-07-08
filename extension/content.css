@@ -1,218 +1,486 @@
-/* SocialScribe+ Extension Styles */
+/* SocialScribe Redesigned Content Styles */
 
-/* Grammarly-style icons */
-.socialscribe-icon-container {
-  position: absolute;
-  z-index: 10000;
-  pointer-events: auto;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+:root {
+  --ss-primary: #6366f1;
+  --ss-primary-dark: #4f46e5;
+  --ss-secondary: #f1f5f9;
+  --ss-text-primary: #0f172a;
+  --ss-text-secondary: #64748b;
+  --ss-text-muted: #94a3b8;
+  --ss-border: #e2e8f0;
+  --ss-surface: #ffffff;
+  --ss-surface-hover: #f8fafc;
+  --ss-success: #10b981;
+  --ss-warning: #f59e0b;
+  --ss-error: #ef4444;
+  --ss-radius: 12px;
+  --ss-radius-sm: 8px;
+  --ss-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --ss-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --ss-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-.socialscribe-icon {
-  width: 20px;
-  height: 20px;
-  background: #3b82f6;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-  transition: all 0.2s ease;
+/* Dark mode variables */
+.ss-dark {
+  --ss-primary: #818cf8;
+  --ss-primary-dark: #6366f1;
+  --ss-secondary: #1e293b;
+  --ss-text-primary: #f1f5f9;
+  --ss-text-secondary: #cbd5e1;
+  --ss-text-muted: #64748b;
+  --ss-border: #334155;
+  --ss-surface: #0f172a;
+  --ss-surface-hover: #1e293b;
+  --ss-success: #34d399;
+  --ss-warning: #fbbf24;
+  --ss-error: #f87171;
 }
 
-.socialscribe-icon:hover {
-  background: #2563eb;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+/* Floating Widget */
+.socialscribe-widget {
+  position: absolute !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: var(--ss-text-primary) !important;
 }
 
-.socialscribe-icon svg {
-  width: 12px;
-  height: 12px;
+.socialscribe-floating-button {
+  width: 36px !important;
+  height: 36px !important;
+  background: linear-gradient(135deg, var(--ss-primary) 0%, var(--ss-primary-dark) 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: var(--ss-shadow-lg) !important;
+  backdrop-filter: blur(10px) !important;
+  opacity: 0 !important;
+  transform: scale(0.8) !important;
+  animation: ss-fadeIn 0.3s ease forwards !important;
 }
 
-#socialscribe-floating-btn {
-  position: absolute;
-  z-index: 10000;
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  transition: all 0.2s ease;
-  color: white;
+.socialscribe-floating-button:hover {
+  transform: scale(1.1) !important;
+  box-shadow: var(--ss-shadow-xl) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
-#socialscribe-floating-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+.socialscribe-floating-button:active {
+  transform: scale(0.95) !important;
 }
 
-#socialscribe-popup {
-  position: absolute;
-  z-index: 10001;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e5e7eb;
-  width: 300px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  display: none;
-  overflow: hidden;
+.socialscribe-floating-button svg {
+  width: 18px !important;
+  height: 18px !important;
+  color: white !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
 }
 
-.socialscribe-popup-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  color: white;
+/* Quick Actions Panel */
+.socialscribe-quick-panel {
+  position: absolute !important;
+  top: -8px !important;
+  right: 50px !important;
+  background: var(--ss-surface) !important;
+  border: 1px solid var(--ss-border) !important;
+  border-radius: var(--ss-radius) !important;
+  box-shadow: var(--ss-shadow-xl) !important;
+  padding: 12px !important;
+  min-width: 280px !important;
+  opacity: 0 !important;
+  transform: translateX(10px) scale(0.95) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  pointer-events: none !important;
+  backdrop-filter: blur(20px) !important;
 }
 
-.socialscribe-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 14px;
+.socialscribe-quick-panel.show {
+  opacity: 1 !important;
+  transform: translateX(0) scale(1) !important;
+  pointer-events: auto !important;
+}
+
+.socialscribe-quick-panel::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 20px !important;
+  right: -6px !important;
+  width: 12px !important;
+  height: 12px !important;
+  background: var(--ss-surface) !important;
+  border: 1px solid var(--ss-border) !important;
+  border-left: none !important;
+  border-bottom: none !important;
+  transform: rotate(45deg) !important;
+}
+
+/* Quick Actions Header */
+.socialscribe-quick-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  margin-bottom: 12px !important;
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid var(--ss-border) !important;
+}
+
+.socialscribe-quick-title {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--ss-text-primary) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
 }
 
 .socialscribe-close-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  width: 20px !important;
+  height: 20px !important;
+  border: none !important;
+  background: none !important;
+  color: var(--ss-text-muted) !important;
+  cursor: pointer !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
 }
 
 .socialscribe-close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: var(--ss-surface-hover) !important;
+  color: var(--ss-text-secondary) !important;
 }
 
-.socialscribe-popup-content {
-  padding: 16px;
+/* Tone Selector Radial */
+.socialscribe-tone-radial {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+  flex-wrap: wrap !important;
 }
 
-.socialscribe-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
+.socialscribe-tone-option {
+  width: 40px !important;
+  height: 40px !important;
+  border: 2px solid var(--ss-border) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: var(--ss-surface) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.socialscribe-tone-option::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(135deg, var(--ss-primary), var(--ss-primary-dark)) !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+.socialscribe-tone-option:hover {
+  border-color: var(--ss-primary) !important;
+  transform: scale(1.1) !important;
+}
+
+.socialscribe-tone-option:hover::before {
+  opacity: 0.1 !important;
+}
+
+.socialscribe-tone-option.active {
+  border-color: var(--ss-primary) !important;
+  background: var(--ss-primary) !important;
+  color: white !important;
+  transform: scale(1.05) !important;
+}
+
+.socialscribe-tone-option.active::before {
+  opacity: 0 !important;
+}
+
+.socialscribe-tone-emoji {
+  font-size: 18px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.socialscribe-tone-option.active .socialscribe-tone-emoji {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Quick Actions */
+.socialscribe-quick-actions {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
 }
 
 .socialscribe-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: white;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  color: #374151;
+  padding: 10px 12px !important;
+  border: 1px solid var(--ss-border) !important;
+  border-radius: var(--ss-radius-sm) !important;
+  background: var(--ss-surface) !important;
+  color: var(--ss-text-secondary) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  text-align: center !important;
 }
 
 .socialscribe-action-btn:hover {
-  background: #f9fafb;
-  border-color: #3b82f6;
-  color: #3b82f6;
+  border-color: var(--ss-primary) !important;
+  background: var(--ss-surface-hover) !important;
+  color: var(--ss-text-primary) !important;
+  transform: translateY(-1px) !important;
 }
 
-.action-icon {
-  font-size: 14px;
+.socialscribe-action-btn:active {
+  transform: translateY(0) !important;
 }
 
-.socialscribe-tone-selector {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+.socialscribe-action-btn svg {
+  width: 14px !important;
+  height: 14px !important;
 }
 
-.socialscribe-tone-selector label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 6px;
-  color: #374151;
+/* Platform-specific adaptations */
+.socialscribe-widget[data-platform="twitter"] .socialscribe-quick-panel {
+  min-width: 240px !important;
+  padding: 10px !important;
 }
 
-.socialscribe-tone-select {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 13px;
-  background: white;
-  cursor: pointer;
+.socialscribe-widget[data-platform="twitter"] .socialscribe-tone-radial {
+  gap: 6px !important;
 }
 
-.socialscribe-tone-select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.socialscribe-widget[data-platform="twitter"] .socialscribe-tone-option {
+  width: 32px !important;
+  height: 32px !important;
 }
 
+.socialscribe-widget[data-platform="linkedin"] .socialscribe-quick-panel {
+  min-width: 320px !important;
+}
+
+.socialscribe-widget[data-platform="gmail"] .socialscribe-quick-panel {
+  min-width: 300px !important;
+  max-width: 400px !important;
+}
+
+/* Instant Suggestions Tooltip */
+.socialscribe-suggestion-tooltip {
+  position: absolute !important;
+  background: var(--ss-surface) !important;
+  border: 1px solid var(--ss-border) !important;
+  border-radius: var(--ss-radius-sm) !important;
+  box-shadow: var(--ss-shadow-lg) !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  color: var(--ss-text-secondary) !important;
+  z-index: 999998 !important;
+  opacity: 0 !important;
+  transform: translateY(-5px) !important;
+  transition: all 0.2s ease !important;
+  pointer-events: none !important;
+  backdrop-filter: blur(10px) !important;
+  max-width: 200px !important;
+}
+
+.socialscribe-suggestion-tooltip.show {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+.socialscribe-suggestion-tooltip::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 100% !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  border: 5px solid transparent !important;
+  border-top-color: var(--ss-surface) !important;
+}
+
+/* Suggestion Actions */
+.socialscribe-suggestion-actions {
+  display: flex !important;
+  gap: 6px !important;
+  margin-top: 8px !important;
+}
+
+.socialscribe-suggestion-btn {
+  padding: 4px 8px !important;
+  border: 1px solid var(--ss-border) !important;
+  border-radius: 4px !important;
+  background: var(--ss-surface) !important;
+  color: var(--ss-text-secondary) !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.socialscribe-suggestion-btn:hover {
+  border-color: var(--ss-primary) !important;
+  color: var(--ss-primary) !important;
+}
+
+.socialscribe-suggestion-btn.primary {
+  background: var(--ss-primary) !important;
+  border-color: var(--ss-primary) !important;
+  color: white !important;
+}
+
+.socialscribe-suggestion-btn.primary:hover {
+  background: var(--ss-primary-dark) !important;
+}
+
+/* Loading States */
 .socialscribe-loading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 0;
-  justify-content: center;
-  color: #6b7280;
-  font-size: 14px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 12px !important;
+  color: var(--ss-text-muted) !important;
+  font-size: 12px !important;
 }
 
 .socialscribe-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid #e5e7eb;
-  border-top: 2px solid #3b82f6;
-  border-radius: 50%;
-  animation: socialscribe-spin 1s linear infinite;
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid var(--ss-border) !important;
+  border-top: 2px solid var(--ss-primary) !important;
+  border-radius: 50% !important;
+  animation: ss-spin 1s linear infinite !important;
 }
 
-@keyframes socialscribe-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Success/Error States */
+.socialscribe-status {
+  padding: 8px 12px !important;
+  border-radius: var(--ss-radius-sm) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  margin-bottom: 8px !important;
 }
 
-/* Platform-specific adjustments */
-[data-testid="tweetTextarea_0"] ~ #socialscribe-floating-btn,
-[data-testid="dmComposerTextInput"] ~ #socialscribe-floating-btn {
-  /* Twitter specific positioning */
-  right: 10px !important;
-  left: auto !important;
+.socialscribe-status.success {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: var(--ss-success) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
 }
 
-.msg-form__contenteditable ~ #socialscribe-floating-btn {
-  /* LinkedIn specific positioning */
-  right: 10px !important;
-  left: auto !important;
+.socialscribe-status.error {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: var(--ss-error) !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
 }
 
-/* Ensure popup appears above other elements */
-#socialscribe-popup {
-  z-index: 999999 !important;
+/* Animations */
+@keyframes ss-fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-#socialscribe-floating-btn {
-  z-index: 999998 !important;
+@keyframes ss-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ss-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .socialscribe-quick-panel {
+    min-width: 260px !important;
+    max-width: 90vw !important;
+  }
+  
+  .socialscribe-tone-radial {
+    gap: 6px !important;
+  }
+  
+  .socialscribe-tone-option {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .socialscribe-floating-button {
+    border-width: 3px !important;
+  }
+  
+  .socialscribe-quick-panel {
+    border-width: 2px !important;
+  }
+  
+  .socialscribe-tone-option {
+    border-width: 3px !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .socialscribe-floating-button,
+  .socialscribe-quick-panel,
+  .socialscribe-tone-option,
+  .socialscribe-action-btn,
+  .socialscribe-suggestion-tooltip {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.socialscribe-floating-button:focus,
+.socialscribe-tone-option:focus,
+.socialscribe-action-btn:focus,
+.socialscribe-suggestion-btn:focus {
+  outline: 2px solid var(--ss-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Print styles */
+@media print {
+  .socialscribe-widget {
+    display: none !important;
+  }
 }

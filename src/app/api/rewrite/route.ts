@@ -11,6 +11,19 @@ interface RequestBody {
   customInstructions?: string
 }
 
+// Handle CORS preflight requests
+export async function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}
+
 export async function POST(request: Request) {
   try {
     const { text, action, tone, platform, context, customInstructions }: RequestBody = await request.json()
@@ -166,8 +179,9 @@ export async function POST(request: Request) {
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
           'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'POST',
-          'Access-Control-Allow-Headers': 'Content-Type',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+          'Access-Control-Max-Age': '86400',
         },
       })
 

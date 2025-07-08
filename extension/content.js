@@ -1,479 +1,751 @@
-// SocialScribe+ Content Script
-class SocialScribeExtension {
+// SocialScribe Redesigned Content Script
+class SocialScribeWidget {
   constructor() {
-    this.apiUrl = 'https://socialscribe.pages.dev/api/rewrite'
-    this.activeElement = null
-    this.floatingButton = null
-    this.popup = null
-    this.isProcessing = false
+    this.apiUrl = 'https://socialscribe.pages.dev/api/rewrite';
+    this.activeElement = null;
+    this.currentWidget = null;
+    this.currentPanel = null;
+    this.selectedTone = 'professional';
+    this.isProcessing = false;
+    this.platform = this.detectPlatform();
+    this.isDarkMode = this.detectDarkMode();
+    this.suggestions = new Map();
     
-    this.init()
+    this.tones = [
+      { id: 'professional', emoji: '🎓', label: 'Professional' },
+      { id: 'casual', emoji: '😎', label: 'Casual' },
+      { id: 'friendly', emoji: '😊', label: 'Friendly' },
+      { id: 'formal', emoji: '👔', label: 'Formal' },
+      { id: 'flirty', emoji: '💕', label: 'Flirty' },
+      { id: 'confident', emoji: '💪', label: 'Confident' },
+      { id: 'humorous', emoji: '😄', label: 'Humorous' },
+      { id: 'empathetic', emoji: '🤗', label: 'Empathetic' }
+    ];
+    
+    this.init();
   }
 
   init() {
-    this.createFloatingButton()
-    this.attachEventListeners()
-    this.observeTextareas()
-    this.addIconsToExistingFields()
-    this.startObserver()
+    this.injectStyles();
+    this.setupObserver();
+    this.attachToExistingFields();
+    this.setupKeyboardShortcuts();
+    this.setupMessageListener();
+    
+    // Platform-specific initialization
+    this.platformSpecificInit();
   }
 
-  // Create the floating AI button
-  createFloatingButton() {
-    this.floatingButton = document.createElement('div')
-    this.floatingButton.id = 'socialscribe-floating-btn'
-    this.floatingButton.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
-        <path d="M19 15L20.09 18.26L23 19L20.09 19.74L19 23L17.91 19.74L15 19L17.91 18.26L19 15Z" fill="currentColor"/>
-        <path d="M5 6L6.09 9.26L9 10L6.09 10.74L5 14L3.91 10.74L1 10L3.91 9.26L5 6Z" fill="currentColor"/>
-      </svg>
-    `
-    this.floatingButton.style.display = 'none'
-    document.body.appendChild(this.floatingButton)
+  injectStyles() {
+    if (document.getElementById('socialscribe-styles')) return;
+    
+    const link = document.createElement('link');
+    link.id = 'socialscribe-styles';
+    link.rel = 'stylesheet';
+    link.href = chrome.runtime.getURL('content.css');
+    document.head.appendChild(link);
   }
 
-  // Create the popup interface
-  createPopup() {
-    if (this.popup) return
-
-    this.popup = document.createElement('div')
-    this.popup.id = 'socialscribe-popup'
-    this.popup.innerHTML = `
-      <div class="socialscribe-popup-header">
-        <div class="socialscribe-logo">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
-          </svg>
-          SocialScribe+
-        </div>
-        <button class="socialscribe-close-btn">&times;</button>
-      </div>
-      <div class="socialscribe-popup-content">
-        <div class="socialscribe-actions">
-          <button class="socialscribe-action-btn" data-action="fix_grammar">
-            <span class="action-icon">✓</span>
-            Fix Grammar
-          </button>
-          <button class="socialscribe-action-btn" data-action="rewrite">
-            <span class="action-icon">✍️</span>
-            Rewrite
-          </button>
-          <button class="socialscribe-action-btn" data-action="shorten">
-            <span class="action-icon">📝</span>
-            Shorten
-          </button>
-          <button class="socialscribe-action-btn" data-action="expand">
-            <span class="action-icon">📄</span>
-            Expand
-          </button>
-          <button class="socialscribe-action-btn" data-action="formalize">
-            <span class="action-icon">👔</span>
-            Formalize
-          </button>
-          <button class="socialscribe-action-btn" data-action="summarize">
-            <span class="action-icon">📋</span>
-            Summarize
-          </button>
-        </div>
-        <div class="socialscribe-tone-selector" style="display: none;">
-          <label>Tone:</label>
-          <select class="socialscribe-tone-select">
-            <option value="professional">Professional</option>
-            <option value="casual">Casual</option>
-            <option value="friendly">Friendly</option>
-            <option value="formal">Formal</option>
-            <option value="humorous">Humorous</option>
-            <option value="persuasive">Persuasive</option>
-            <option value="empathetic">Empathetic</option>
-            <option value="confident">Confident</option>
-          </select>
-        </div>
-        <div class="socialscribe-loading" style="display: none;">
-          <div class="socialscribe-spinner"></div>
-          <span>Improving your text...</span>
-        </div>
-      </div>
-    `
-    document.body.appendChild(this.popup)
-
-    // Add event listeners
-    this.popup.querySelector('.socialscribe-close-btn').addEventListener('click', () => {
-      this.hidePopup()
-    })
-
-    this.popup.querySelectorAll('.socialscribe-action-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        const action = e.currentTarget.dataset.action
-        if (action === 'rewrite') {
-          this.showToneSelector()
-        } else {
-          this.processText(action)
-        }
-      })
-    })
-
-    this.popup.querySelector('.socialscribe-tone-select').addEventListener('change', (e) => {
-      this.processText('rewrite', e.target.value)
-    })
+  detectPlatform() {
+    const hostname = window.location.hostname.toLowerCase();
+    
+    if (hostname.includes('twitter.com') || hostname.includes('x.com')) return 'twitter';
+    if (hostname.includes('linkedin.com')) return 'linkedin';
+    if (hostname.includes('gmail.com')) return 'gmail';
+    if (hostname.includes('medium.com')) return 'medium';
+    if (hostname.includes('reddit.com')) return 'reddit';
+    if (hostname.includes('facebook.com')) return 'facebook';
+    if (hostname.includes('notion.so')) return 'notion';
+    if (hostname.includes('docs.google.com')) return 'gdocs';
+    
+    return 'general';
   }
 
-  // Observe textareas and input fields
-  observeTextareas() {
+  detectDarkMode() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ||
+           document.documentElement.classList.contains('dark') ||
+           document.body.classList.contains('dark');
+  }
+
+  platformSpecificInit() {
+    switch (this.platform) {
+      case 'twitter':
+        this.setupTwitterSpecific();
+        break;
+      case 'linkedin':
+        this.setupLinkedInSpecific();
+        break;
+      case 'gmail':
+        this.setupGmailSpecific();
+        break;
+      default:
+        this.setupGeneralPlatform();
+    }
+  }
+
+  setupTwitterSpecific() {
+    // Twitter-specific optimizations
+    this.observeTwitterCompose();
+  }
+
+  setupLinkedInSpecific() {
+    // LinkedIn-specific optimizations
+    this.observeLinkedInEditor();
+  }
+
+  setupGmailSpecific() {
+    // Gmail-specific optimizations
+    this.observeGmailCompose();
+  }
+
+  setupGeneralPlatform() {
+    // General platform setup
+  }
+
+  setupObserver() {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         mutation.addedNodes.forEach((node) => {
           if (node.nodeType === 1) {
-            this.attachToTextInputs(node)
+            this.attachToNewElements(node);
           }
-        })
-      })
-    })
+        });
+      });
+    });
 
     observer.observe(document.body, {
       childList: true,
       subtree: true
-    })
-
-    // Initial attachment
-    this.attachToTextInputs(document)
+    });
   }
 
-  attachToTextInputs(container) {
-    const textInputs = container.querySelectorAll('textarea, input[type="text"], input[type="email"], input[type="search"], [contenteditable="true"]')
+  attachToExistingFields() {
+    const selectors = this.getTextFieldSelectors();
+    const elements = document.querySelectorAll(selectors.join(', '));
     
-    textInputs.forEach(input => {
-      if (input.dataset.socialscribeAttached) return
-      
-      input.dataset.socialscribeAttached = 'true'
-      
-      // Add Grammarly-style icon to each field
-      this.addIconToElement(input)
-      
-      input.addEventListener('focus', (e) => {
-        this.activeElement = e.target
-        this.showFloatingButton(e.target)
-      })
-      
-      input.addEventListener('blur', (e) => {
-        setTimeout(() => {
-          if (!this.popup || !this.popup.contains(document.activeElement)) {
-            this.hideFloatingButton()
-          }
-        }, 100)
-      })
-    })
+    elements.forEach(element => {
+      this.attachToElement(element);
+    });
   }
 
-  attachEventListeners() {
-    this.floatingButton.addEventListener('click', () => {
-      this.createPopup()
-      this.showPopup()
-    })
+  attachToNewElements(container) {
+    const selectors = this.getTextFieldSelectors();
+    
+    if (this.matchesSelector(container, selectors)) {
+      this.attachToElement(container);
+    }
+    
+    const elements = container.querySelectorAll(selectors.join(', '));
+    elements.forEach(element => {
+      this.attachToElement(element);
+    });
+  }
 
-    // Close popup when clicking outside
-    document.addEventListener('click', (e) => {
-      if (this.popup && !this.popup.contains(e.target) && !this.floatingButton.contains(e.target)) {
-        this.hidePopup()
+  getTextFieldSelectors() {
+    const baseSelectors = [
+      'textarea',
+      'input[type="text"]',
+      'input[type="email"]',
+      'input[type="search"]',
+      '[contenteditable="true"]',
+      '[contenteditable=""]'
+    ];
+
+    // Platform-specific selectors
+    const platformSelectors = {
+      twitter: [
+        '[data-testid="tweetTextarea_0"]',
+        '[data-testid="dmComposerTextInput"]',
+        '.DraftEditor-editorContainer'
+      ],
+      linkedin: [
+        '.ql-editor',
+        '[data-placeholder*="Share an update"]',
+        '.msg-form__contenteditable'
+      ],
+      gmail: [
+        '[contenteditable="true"][role="textbox"]',
+        '.Am.Al.editable'
+      ]
+    };
+
+    return [...baseSelectors, ...(platformSelectors[this.platform] || [])];
+  }
+
+  matchesSelector(element, selectors) {
+    return selectors.some(selector => {
+      try {
+        return element.matches(selector);
+      } catch (e) {
+        return false;
       }
-    })
+    });
+  }
 
-    // Keyboard shortcut: Cmd/Ctrl + Shift + G
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'G') {
-        e.preventDefault()
-        if (this.activeElement && this.getTextFromElement(this.activeElement)) {
-          this.processText('fix_grammar')
+  attachToElement(element) {
+    if (element.dataset.socialscribeAttached || !this.isValidElement(element)) {
+      return;
+    }
+
+    element.dataset.socialscribeAttached = 'true';
+    
+    // Create widget for this element
+    const widget = this.createWidget(element);
+    
+    // Setup event listeners
+    this.setupElementListeners(element, widget);
+    
+    // Position widget
+    this.positionWidget(element, widget);
+  }
+
+  isValidElement(element) {
+    const rect = element.getBoundingClientRect();
+    const style = window.getComputedStyle(element);
+    
+    return rect.width > 50 && 
+           rect.height > 20 && 
+           style.display !== 'none' && 
+           style.visibility !== 'hidden' &&
+           !element.disabled &&
+           !element.readOnly;
+  }
+
+  createWidget(element) {
+    const widget = document.createElement('div');
+    widget.className = 'socialscribe-widget';
+    widget.dataset.platform = this.platform;
+    
+    if (this.isDarkMode) {
+      widget.classList.add('ss-dark');
+    }
+
+    const button = document.createElement('div');
+    button.className = 'socialscribe-floating-button';
+    button.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/>
+        <path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/>
+        <path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/>
+      </svg>
+    `;
+
+    widget.appendChild(button);
+    document.body.appendChild(widget);
+
+    // Create quick panel
+    const panel = this.createQuickPanel();
+    widget.appendChild(panel);
+
+    return widget;
+  }
+
+  createQuickPanel() {
+    const panel = document.createElement('div');
+    panel.className = 'socialscribe-quick-panel';
+    
+    panel.innerHTML = `
+      <div class="socialscribe-quick-header">
+        <div class="socialscribe-quick-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          SocialScribe
+        </div>
+        <button class="socialscribe-close-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="socialscribe-tone-radial">
+        ${this.tones.slice(0, 6).map(tone => `
+          <div class="socialscribe-tone-option ${tone.id === this.selectedTone ? 'active' : ''}" 
+               data-tone="${tone.id}" 
+               title="${tone.label}">
+            <span class="socialscribe-tone-emoji">${tone.emoji}</span>
+          </div>
+        `).join('')}
+      </div>
+      
+      <div class="socialscribe-quick-actions">
+        <button class="socialscribe-action-btn" data-action="fix_grammar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="10"/>
+          </svg>
+          Fix Grammar
+        </button>
+        <button class="socialscribe-action-btn" data-action="rewrite">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          Rewrite
+        </button>
+        <button class="socialscribe-action-btn" data-action="shorten">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/>
+            <path d="M6 12h9"/>
+          </svg>
+          Shorten
+        </button>
+        <button class="socialscribe-action-btn" data-action="expand">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Expand
+        </button>
+      </div>
+    `;
+
+    return panel;
+  }
+
+  setupElementListeners(element, widget) {
+    const button = widget.querySelector('.socialscribe-floating-button');
+    const panel = widget.querySelector('.socialscribe-quick-panel');
+    const closeBtn = widget.querySelector('.socialscribe-close-btn');
+    
+    // Show/hide widget based on focus
+    element.addEventListener('focus', () => {
+      this.activeElement = element;
+      this.currentWidget = widget;
+      this.currentPanel = panel;
+      this.showWidget(widget);
+      this.positionWidget(element, widget);
+    });
+
+    element.addEventListener('blur', (e) => {
+      setTimeout(() => {
+        if (!widget.contains(document.activeElement) && 
+            document.activeElement !== element) {
+          this.hideWidget(widget);
         }
+      }, 150);
+    });
+
+    // Button click to toggle panel
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.togglePanel(panel);
+    });
+
+    // Close button
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.hidePanel(panel);
+    });
+
+    // Tone selection
+    const toneOptions = panel.querySelectorAll('.socialscribe-tone-option');
+    toneOptions.forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.selectTone(option.dataset.tone, panel);
+      });
+    });
+
+    // Action buttons
+    const actionBtns = panel.querySelectorAll('.socialscribe-action-btn');
+    actionBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.handleAction(btn.dataset.action, element);
+      });
+    });
+
+    // Real-time suggestions
+    this.setupRealTimeSuggestions(element);
+
+    // Resize observer for repositioning
+    if (window.ResizeObserver) {
+      const resizeObserver = new ResizeObserver(() => {
+        this.positionWidget(element, widget);
+      });
+      resizeObserver.observe(element);
+    }
+  }
+
+  setupRealTimeSuggestions(element) {
+    let timeout;
+    
+    element.addEventListener('input', () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        this.checkForSuggestions(element);
+      }, 1000);
+    });
+  }
+
+  async checkForSuggestions(element) {
+    const text = this.getElementText(element);
+    if (!text || text.length < 10) return;
+
+    // Simple grammar check (this could be enhanced with a proper grammar API)
+    const suggestions = this.getQuickSuggestions(text);
+    if (suggestions.length > 0) {
+      this.showSuggestionTooltip(element, suggestions[0]);
+    }
+  }
+
+  getQuickSuggestions(text) {
+    const suggestions = [];
+    
+    // Basic grammar checks
+    if (text.includes(' i ')) {
+      suggestions.push({
+        type: 'grammar',
+        message: 'Consider capitalizing "I"',
+        fix: text.replace(/ i /g, ' I ')
+      });
+    }
+    
+    if (text.match(/\w+\s+\w+\s+\w+\s+\w+\s+\w+\s+\w+\s+\w+/)) {
+      suggestions.push({
+        type: 'style',
+        message: 'This sentence might be too long',
+        action: 'shorten'
+      });
+    }
+    
+    return suggestions;
+  }
+
+  showSuggestionTooltip(element, suggestion) {
+    const existing = document.querySelector('.socialscribe-suggestion-tooltip');
+    if (existing) existing.remove();
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'socialscribe-suggestion-tooltip';
+    
+    tooltip.innerHTML = `
+      <div>${suggestion.message}</div>
+      <div class="socialscribe-suggestion-actions">
+        <button class="socialscribe-suggestion-btn primary" data-action="apply">
+          ${suggestion.fix ? 'Fix' : 'Improve'}
+        </button>
+        <button class="socialscribe-suggestion-btn" data-action="dismiss">
+          Dismiss
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(tooltip);
+    
+    // Position tooltip
+    const rect = element.getBoundingClientRect();
+    tooltip.style.left = rect.left + 'px';
+    tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+    
+    setTimeout(() => tooltip.classList.add('show'), 10);
+
+    // Setup tooltip actions
+    tooltip.querySelector('[data-action="apply"]').addEventListener('click', () => {
+      if (suggestion.fix) {
+        this.setElementText(element, suggestion.fix);
+      } else if (suggestion.action) {
+        this.handleAction(suggestion.action, element);
       }
-    })
+      tooltip.remove();
+    });
+
+    tooltip.querySelector('[data-action="dismiss"]').addEventListener('click', () => {
+      tooltip.remove();
+    });
+
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+      if (tooltip.parentNode) tooltip.remove();
+    }, 5000);
   }
 
-  showFloatingButton(element) {
-    const rect = element.getBoundingClientRect()
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+  positionWidget(element, widget) {
+    const rect = element.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
     
-    this.floatingButton.style.display = 'flex'
-    this.floatingButton.style.top = (rect.bottom + scrollTop - 10) + 'px'
-    this.floatingButton.style.left = (rect.right + scrollLeft - 40) + 'px'
+    // Position in bottom-right corner of element
+    widget.style.position = 'absolute';
+    widget.style.left = (rect.right - 45 + scrollLeft) + 'px';
+    widget.style.top = (rect.bottom - 45 + scrollTop) + 'px';
+    widget.style.zIndex = '999999';
   }
 
-  hideFloatingButton() {
-    this.floatingButton.style.display = 'none'
+  showWidget(widget) {
+    widget.style.display = 'block';
+    const button = widget.querySelector('.socialscribe-floating-button');
+    setTimeout(() => {
+      button.style.opacity = '1';
+      button.style.transform = 'scale(1)';
+    }, 10);
   }
 
-  showPopup() {
-    if (!this.popup) this.createPopup()
+  hideWidget(widget) {
+    const button = widget.querySelector('.socialscribe-floating-button');
+    const panel = widget.querySelector('.socialscribe-quick-panel');
     
-    const rect = this.floatingButton.getBoundingClientRect()
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
+    button.style.opacity = '0';
+    button.style.transform = 'scale(0.8)';
+    panel.classList.remove('show');
     
-    this.popup.style.display = 'block'
-    this.popup.style.top = (rect.top + scrollTop - 200) + 'px'
-    this.popup.style.left = (rect.left + scrollLeft - 150) + 'px'
+    setTimeout(() => {
+      widget.style.display = 'none';
+    }, 300);
+  }
+
+  togglePanel(panel) {
+    panel.classList.toggle('show');
+  }
+
+  hidePanel(panel) {
+    panel.classList.remove('show');
+  }
+
+  selectTone(toneId, panel) {
+    this.selectedTone = toneId;
     
-    // Adjust position if popup goes off screen
-    const popupRect = this.popup.getBoundingClientRect()
-    if (popupRect.right > window.innerWidth) {
-      this.popup.style.left = (window.innerWidth - popupRect.width - 20) + 'px'
+    const toneOptions = panel.querySelectorAll('.socialscribe-tone-option');
+    toneOptions.forEach(option => {
+      option.classList.toggle('active', option.dataset.tone === toneId);
+    });
+
+    // Haptic feedback
+    this.addHapticFeedback();
+  }
+
+  async handleAction(action, element) {
+    if (this.isProcessing) return;
+
+    const text = this.getElementText(element);
+    if (!text.trim()) {
+      this.showToast('Please enter some text first', 'warning');
+      return;
     }
-    if (popupRect.top < 0) {
-      this.popup.style.top = '20px'
-    }
-  }
 
-  hidePopup() {
-    if (this.popup) {
-      this.popup.style.display = 'none'
-      this.hideToneSelector()
-    }
-  }
-
-  showToneSelector() {
-    const toneSelector = this.popup.querySelector('.socialscribe-tone-selector')
-    toneSelector.style.display = 'block'
-  }
-
-  hideToneSelector() {
-    const toneSelector = this.popup.querySelector('.socialscribe-tone-selector')
-    if (toneSelector) {
-      toneSelector.style.display = 'none'
-    }
-  }
-
-  showLoading() {
-    const loading = this.popup.querySelector('.socialscribe-loading')
-    const actions = this.popup.querySelector('.socialscribe-actions')
-    loading.style.display = 'flex'
-    actions.style.display = 'none'
-    this.hideToneSelector()
-  }
-
-  hideLoading() {
-    const loading = this.popup.querySelector('.socialscribe-loading')
-    const actions = this.popup.querySelector('.socialscribe-actions')
-    loading.style.display = 'none'
-    actions.style.display = 'grid'
-  }
-
-  getTextFromElement(element) {
-    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
-      return element.value
-    } else if (element.contentEditable === 'true') {
-      return element.textContent || element.innerText
-    }
-    return ''
-  }
-
-  setTextToElement(element, text) {
-    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
-      element.value = text
-      element.dispatchEvent(new Event('input', { bubbles: true }))
-    } else if (element.contentEditable === 'true') {
-      element.textContent = text
-      element.dispatchEvent(new Event('input', { bubbles: true }))
-    }
-  }
-
-  async processText(action, tone = 'professional') {
-    if (!this.activeElement || this.isProcessing) return
-
-    const originalText = this.getTextFromElement(this.activeElement)
-    if (!originalText.trim()) return
-
-    this.isProcessing = true
-    this.showLoading()
+    this.setProcessingState(true);
 
     try {
+      const result = await this.processText(text, action, this.selectedTone);
+      if (result) {
+        this.setElementText(element, result);
+        this.showToast(`Text ${action}ed successfully!`, 'success');
+        this.addHapticFeedback();
+        
+        // Hide panel after successful action
+        if (this.currentPanel) {
+          this.hidePanel(this.currentPanel);
+        }
+      }
+    } catch (error) {
+      console.error('Action error:', error);
+      this.showToast('Failed to process text. Please try again.', 'error');
+    } finally {
+      this.setProcessingState(false);
+    }
+  }
+
+  async processText(text, action, tone) {
+    try {
+      // Try direct API call first
       const response = await fetch(this.apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: originalText,
+          text: text,
           action: action,
           tone: tone,
-          platform: this.detectPlatform()
+          platform: this.platform
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to process text')
+        throw new Error('Failed to process text');
       }
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let improvedText = ''
+      return await this.processStreamResponse(response);
+    } catch (error) {
+      // Fallback: Use background script as proxy for CORS issues
+      console.log('Direct API failed, trying background script proxy:', error);
+      return await this.processTextViaBackground(text, action, tone);
+    }
+  }
 
-      while (true) {
-        const { done, value } = await reader.read()
-        if (done) break
+  async processTextViaBackground(text, action, tone) {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({
+        action: 'processText',
+        data: {
+          text: text,
+          action: action,
+          tone: tone,
+          platform: this.platform
+        }
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else if (response.error) {
+          reject(new Error(response.error));
+        } else {
+          resolve(response.result);
+        }
+      });
+    });
+  }
 
-        const chunk = decoder.decode(value)
-        const lines = chunk.split('\n')
+  async processStreamResponse(response) {
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6)
-            try {
-              const parsed = JSON.parse(data)
-              if (parsed.content) {
-                improvedText += parsed.content
-              }
-            } catch (e) {
-              // Skip invalid JSON
+    let result = '';
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n');
+
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.content) {
+              result += parsed.content;
             }
+          } catch (e) {
+            // Skip invalid JSON
           }
         }
       }
+    }
 
-      if (improvedText.trim()) {
-        this.setTextToElement(this.activeElement, improvedText.trim())
-      }
+    return result.trim();
+  }
 
-    } catch (error) {
-      console.error('SocialScribe+ Error:', error)
-      // Show error message to user
-      alert('Sorry, there was an error processing your text. Please try again.')
-    } finally {
-      this.isProcessing = false
-      this.hideLoading()
-      this.hidePopup()
+  getElementText(element) {
+    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
+      return element.value;
+    } else if (element.contentEditable === 'true') {
+      return element.textContent || element.innerText;
+    }
+    return '';
+  }
+
+  setElementText(element, text) {
+    if (element.tagName === 'TEXTAREA' || element.tagName === 'INPUT') {
+      element.value = text;
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+    } else if (element.contentEditable === 'true') {
+      element.textContent = text;
+      element.dispatchEvent(new Event('input', { bubbles: true }));
     }
   }
 
-  // Add SocialScribe icon to a specific element (Grammarly-style)
-  addIconToElement(element) {
-    // Skip if already has icon or is not visible
-    if (element.dataset.socialscribeIconAdded || !this.isElementVisible(element)) {
-      return
+  setProcessingState(processing) {
+    this.isProcessing = processing;
+    
+    if (this.currentPanel) {
+      const actionBtns = this.currentPanel.querySelectorAll('.socialscribe-action-btn');
+      actionBtns.forEach(btn => {
+        btn.disabled = processing;
+        btn.style.opacity = processing ? '0.6' : '1';
+      });
     }
+  }
 
-    element.dataset.socialscribeIconAdded = 'true'
-    
-    // Create icon container
-    const iconContainer = document.createElement('div')
-    iconContainer.className = 'socialscribe-icon-container'
-    iconContainer.innerHTML = `
-      <div class="socialscribe-icon" title="SocialScribe+ AI Writing Assistant">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 8V4l3 3-3 3V8z"/>
-          <path d="M8 12H4l3-3 3 3H8z"/>
-          <path d="M12 16v4l-3-3 3-3v2z"/>
-          <path d="M16 12h4l-3 3-3-3h2z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-      </div>
-    `
-
-    // Position the icon
-    this.positionIcon(element, iconContainer)
-    
-    // Add click handler
-    iconContainer.addEventListener('click', (e) => {
-      e.preventDefault()
-      e.stopPropagation()
-      this.activeElement = element
-      this.showPopup(element)
-    })
-
-    // Add focus/blur handlers to show/hide icon
-    element.addEventListener('focus', () => {
-      iconContainer.style.opacity = '1'
-      iconContainer.style.visibility = 'visible'
-    })
-
-    element.addEventListener('blur', () => {
-      setTimeout(() => {
-        if (document.activeElement !== iconContainer && !iconContainer.contains(document.activeElement)) {
-          iconContainer.style.opacity = '0.6'
+  setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+      // Cmd/Ctrl + Shift + S to open SocialScribe
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'S') {
+        e.preventDefault();
+        if (this.activeElement && this.currentWidget) {
+          const panel = this.currentWidget.querySelector('.socialscribe-quick-panel');
+          this.togglePanel(panel);
         }
-      }, 100)
-    })
-
-    // Show icon on hover
-    element.addEventListener('mouseenter', () => {
-      iconContainer.style.visibility = 'visible'
-      iconContainer.style.opacity = '0.8'
-    })
-
-    element.addEventListener('mouseleave', () => {
-      if (document.activeElement !== element) {
-        iconContainer.style.opacity = '0.6'
       }
-    })
-
-    document.body.appendChild(iconContainer)
+    });
   }
 
-  // Position icon relative to element (like Grammarly)
-  positionIcon(element, iconContainer) {
-    const updatePosition = () => {
-      if (!element.offsetParent) return // Element not visible
-      
-      const rect = element.getBoundingClientRect()
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-      
-      iconContainer.style.position = 'absolute'
-      iconContainer.style.left = (rect.right - 25 + scrollLeft) + 'px'
-      iconContainer.style.top = (rect.bottom - 25 + scrollTop) + 'px'
-      iconContainer.style.zIndex = '10000'
-      iconContainer.style.opacity = '0.6'
-      iconContainer.style.visibility = 'hidden'
-      iconContainer.style.transition = 'opacity 0.2s ease'
-    }
+  setupMessageListener() {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.action === 'contextMenuAction') {
+        if (this.activeElement) {
+          this.handleAction(request.type, this.activeElement);
+        }
+      }
+    });
+  }
 
-    updatePosition()
-    
-    // Update position on scroll and resize
-    const updateHandler = () => updatePosition()
-    window.addEventListener('scroll', updateHandler, { passive: true })
-    window.addEventListener('resize', updateHandler, { passive: true })
-    
-    // Store cleanup function
-    iconContainer._cleanup = () => {
-      window.removeEventListener('scroll', updateHandler)
-      window.removeEventListener('resize', updateHandler)
+  addHapticFeedback() {
+    if (navigator.vibrate) {
+      navigator.vibrate(10);
     }
   }
 
-  // Check if element is visible
-  isElementVisible(element) {
-    if (!element.offsetParent) return false
-    const rect = element.getBoundingClientRect()
-    return rect.width > 0 && rect.height > 0 && 
-           window.getComputedStyle(element).display !== 'none' &&
-           window.getComputedStyle(element).visibility !== 'hidden'
+  showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `socialscribe-status ${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed !important;
+      top: 20px !important;
+      right: 20px !important;
+      z-index: 999999 !important;
+      animation: ss-fadeIn 0.3s ease !important;
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.animation = 'ss-fadeIn 0.3s ease reverse';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
   }
 
-  detectPlatform() {
-    const hostname = window.location.hostname.toLowerCase()
+  // Platform-specific observers
+  observeTwitterCompose() {
+    // Twitter-specific DOM observation
+    const observer = new MutationObserver(() => {
+      const composeAreas = document.querySelectorAll('[data-testid="tweetTextarea_0"]');
+      composeAreas.forEach(area => this.attachToElement(area));
+    });
     
-    if (hostname.includes('twitter.com') || hostname.includes('x.com')) {
-      return 'twitter'
-    } else if (hostname.includes('linkedin.com')) {
-      return 'linkedin'
-    } else if (hostname.includes('gmail.com')) {
-      return 'gmail'
-    } else if (hostname.includes('medium.com')) {
-      return 'medium'
-    } else if (hostname.includes('reddit.com')) {
-      return 'reddit'
-    }
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  observeLinkedInEditor() {
+    // LinkedIn-specific DOM observation
+    const observer = new MutationObserver(() => {
+      const editors = document.querySelectorAll('.ql-editor');
+      editors.forEach(editor => this.attachToElement(editor));
+    });
     
-    return 'general'
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  observeGmailCompose() {
+    // Gmail-specific DOM observation
+    const observer = new MutationObserver(() => {
+      const composeAreas = document.querySelectorAll('[contenteditable="true"][role="textbox"]');
+      composeAreas.forEach(area => this.attachToElement(area));
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 }
 
-// Initialize the extension when the page loads
+// Initialize when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    new SocialScribeExtension()
-  })
+    new SocialScribeWidget();
+  });
 } else {
-  new SocialScribeExtension()
+  new SocialScribeWidget();
 }
