@@ -6,32 +6,32 @@ import ExtensionInstallGuide from "@/components/ExtensionInstallGuide"
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
+      <header className="border-b border-border bg-background sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-              <Brain className="h-5 w-5 text-white" />
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <Brain className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-foreground">
               SocialScribe
             </span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+            <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Features
             </Link>
-            <Link href="#demo" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+            <Link href="#demo" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Rewriter
             </Link>
-            <Link href="#coming-soon" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+            <Link href="#coming-soon" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Coming Soon
             </Link>
-            <Link href="#install" className="text-gray-600 hover:text-gray-900 transition-colors text-sm">
+            <Link href="#install" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
               Install
             </Link>
-            <Button variant="outline" size="sm" asChild className="border-gray-300 text-gray-700 hover:bg-gray-50">
+            <Button variant="outline" size="sm" asChild>
               <Link href="#install">
                 Get Extension
               </Link>
@@ -43,29 +43,29 @@ export default function Home() {
       {/* Hero Section */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-sm mb-8">
+          <div className="inline-flex items-center gap-2 bg-muted text-muted-foreground px-3 py-1 rounded-md text-sm mb-8">
             <Sparkles className="h-3 w-3" />
             Powered by AI
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground leading-tight">
             Write better,
             <br />
             everywhere
           </h1>
           
-          <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
             AI-powered Chrome extension that fixes grammar, rewrites content, and enhances your writing 
             across any website you visit.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center mb-16">
-            <Button size="lg" asChild className="bg-gray-900 hover:bg-gray-800 text-white border-0">
+            <Button size="lg" asChild className="bg-primary hover:bg-primary/90 text-primary-foreground border-0">
               <Link href="#install">
                 Install Extension
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="border-gray-300 text-gray-700 hover:bg-gray-50">
+            <Button size="lg" variant="outline" asChild>
               <Link href="#demo">
                 Try Rewriter
               </Link>
@@ -73,7 +73,7 @@ export default function Home() {
           </div>
 
           {/* Platform Icons */}
-          <div className="flex items-center justify-center gap-12 text-gray-400">
+          <div className="flex items-center justify-center gap-12 text-muted-foreground">
             <div className="flex items-center gap-2">
               <Twitter className="h-5 w-5" />
               <span className="text-sm">Twitter</span>
@@ -253,7 +253,7 @@ export default function Home() {
               <div className="bg-gray-50 rounded-lg p-4 space-y-4">
                 <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">L</span>
+                    <span className="text-primary-foreground text-sm font-medium">L</span>
                   </div>
                   <div>
                     <div className="font-medium text-sm">LinkedIn Chat</div>
@@ -263,7 +263,7 @@ export default function Home() {
 
                 <div className="space-y-3">
                   <div className="flex justify-end">
-                    <div className="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm max-w-xs">
+                    <div className="bg-primary text-primary-foreground px-3 py-2 rounded-lg text-sm max-w-xs">
                       Hey Sarah! I saw your post about the new marketing strategy. Really insightful!
                     </div>
                   </div>
@@ -314,15 +314,15 @@ export default function Home() {
       <footer className="py-12 px-6 border-t border-gray-200 bg-white">
         <div className="max-w-6xl mx-auto text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-6 h-6 bg-gray-900 rounded-md flex items-center justify-center">
-              <Brain className="h-4 w-4 text-white" />
+            <div className="w-6 h-6 bg-primary rounded-md flex items-center justify-center">
+              <Brain className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-lg font-semibold text-gray-900">SocialScribe</span>
+            <span className="text-lg font-semibold text-foreground">SocialScribe</span>
           </div>
-          <p className="text-gray-600 mb-2 text-sm">
+          <p className="text-muted-foreground mb-2 text-sm">
             AI-powered writing assistant
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Powered by AI - Made for better writing
           </p>
         </div>

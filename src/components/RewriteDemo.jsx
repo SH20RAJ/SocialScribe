@@ -180,8 +180,8 @@ export default function RewriteDemo() {
                     onClick={() => setSelectedAction(action.value)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                       selectedAction === action.value
-                        ? "bg-gray-900 text-white border-gray-900"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-border hover:bg-muted"
                     }`}
                   >
                     {action.label}
@@ -202,8 +202,8 @@ export default function RewriteDemo() {
                     onClick={() => setSelectedTone(tone.value)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
                       selectedTone === tone.value
-                        ? "bg-gray-900 text-white border-gray-900"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background text-foreground border-border hover:border-border hover:bg-muted"
                     }`}
                   >
                     {tone.label}
@@ -240,7 +240,7 @@ export default function RewriteDemo() {
             <Button 
               onClick={handleRewrite} 
               disabled={isLoading || !inputText.trim()}
-              className="w-full bg-gray-900 hover:bg-gray-800 text-white border-0"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground border-0"
             >
               {isLoading ? (
                 <>

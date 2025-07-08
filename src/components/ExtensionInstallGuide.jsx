@@ -25,7 +25,7 @@ export default function ExtensionInstallGuide() {
         <Button 
           size="lg" 
           onClick={handleDownload}
-          className="bg-gray-900 hover:bg-gray-800 text-white border-0"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground border-0"
         >
           <Download className="h-4 w-4 mr-2" />
           Download Extension
@@ -73,8 +73,8 @@ export default function ExtensionInstallGuide() {
             <div key={index} className="flex items-start gap-4 p-4 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
               <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-medium ${
                 step.status === "completed" 
-                  ? "bg-gray-900 text-white" 
-                  : "bg-gray-100 text-gray-700"
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted text-muted-foreground"
               }`}>
                 {step.status === "completed" ? (
                   <CheckCircle className="h-3 w-3" />
