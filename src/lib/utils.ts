@@ -33,7 +33,11 @@ export const tones: ToneOption[] = [
   { value: "empathetic", label: "Empathetic", description: "Understanding and caring" },
   { value: "confident", label: "Confident", description: "Assertive and sure" },
   { value: "flirty", label: "Flirty", description: "Playful and charming" },
-  { value: "sarcastic", label: "Sarcastic", description: "Witty and ironic" }
+  { value: "sarcastic", label: "Sarcastic", description: "Witty and ironic" },
+  { value: "inspirational", label: "Inspirational", description: "Uplifting and motivating" },
+  { value: "concise", label: "Concise", description: "Brief and to the point" },
+  { value: "detailed", label: "Detailed", description: "Thorough and comprehensive" },
+  { value: "custom", label: "Custom", description: "Tailored to specific needs" }
 ]
 
 export const platforms: PlatformOption[] = [

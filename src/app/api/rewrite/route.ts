@@ -20,30 +20,34 @@ export async function POST(request: Request) {
     }
 
     // Build the prompt based on action and parameters
-    let prompt = ''
-    
+    let prompt = '';
+
     switch (action) {
       case 'fix_grammar':
-        prompt = `Fix the grammar, spelling, and punctuation in the following text while maintaining the original meaning and tone:\n\n"${text}"`
-        break
+        prompt = `Correct grammar, spelling, and punctuation. Keep the original tone and meaning. Return only the corrected text:\n\n"${text}"`;
+        break;
       case 'rewrite':
-        prompt = `Rewrite the following text in a ${tone} tone${platform ? ` for ${platform}` : ''}:\n\n"${text}"`
-        break
+        prompt = `Rewrite the text in a ${tone} tone${platform ? ` for ${platform}` : ''}. Keep the meaning intact. Return only the rewritten version:\n\n"${text}"`;
+        break;
       case 'shorten':
-        prompt = `Make the following text more concise while keeping the key message:\n\n"${text}"`
-        break
+        prompt = `Shorten this text to be more concise while preserving the core message. Return only the shortened version:\n\n"${text}"`;
+        break;
       case 'expand':
-        prompt = `Expand the following text with more detail and context:\n\n"${text}"`
-        break
+        prompt = `Expand this text with more detail and context. Return only the expanded version:\n\n"${text}"`;
+        break;
       case 'summarize':
-        prompt = `Create a concise summary of the following text:\n\n"${text}"`
-        break
+        prompt = `Summarize this text clearly and concisely. Return only the summary:\n\n"${text}"`;
+        break;
       case 'formalize':
-        prompt = `Rewrite the following text in a more formal and professional tone:\n\n"${text}"`
-        break
+        prompt = `Make this text more formal and professional. Keep the original meaning. Return only the formal version:\n\n"${text}"`;
+        break;
       default:
-        prompt = `Improve the following text:\n\n"${text}"`
+        prompt = `Improve the clarity and effectiveness of this text. Return only the improved version:\n\n"${text}"`;
     }
+
+    const prefix = 'You are an AI writing assistant. Do not explain. Just return the result.';
+    prompt = `${prefix}\n\n${prompt}`;
+
 
     if (context) {
       prompt += `\n\nContext: ${context}`
@@ -101,33 +105,33 @@ export async function POST(request: Request) {
           }
 
           const reader = response.body.getReader()
-          
+
           try {
             while (true) {
               const { done, value } = await reader.read()
-              
+
               if (done) {
                 controller.close()
                 break
               }
-              
+
               const chunk = decoder.decode(value, { stream: true })
               const lines = chunk.split('\n')
-              
+
               for (const line of lines) {
                 if (line.startsWith('data: ')) {
                   const data = line.slice(6).trim()
-                  
+
                   if (data === '[DONE]') {
                     controller.close()
                     return
                   }
-                  
+
                   if (data) {
                     try {
                       const parsed = JSON.parse(data)
                       const content = parsed.choices?.[0]?.delta?.content
-                      
+
                       if (content) {
                         controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
                       }
@@ -174,12 +178,12 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error('API Error:', error)
-    
+
     // Return a more specific error message
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    
+
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to process request',
         details: errorMessage,
         timestamp: new Date().toISOString()
