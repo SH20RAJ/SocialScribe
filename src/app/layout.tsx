@@ -22,7 +22,6 @@ export const metadata = {
     ],
   },
   manifest: '/site.webmanifest',
-  themeColor: '#5854eb',
   openGraph: {
     title: 'SocialScribe+ - AI Writing Assistant',
     description: 'Write better everywhere with our AI-powered Chrome extension',
@@ -56,6 +55,10 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+}
+
+export const viewport = {
+  themeColor: '#5854eb',
 }
 
 export default function RootLayout({ children : children }: { children: React.ReactNode }) {

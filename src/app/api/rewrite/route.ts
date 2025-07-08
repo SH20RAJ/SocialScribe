@@ -70,125 +70,166 @@ export async function POST(request: Request) {
       prompt += `\n\nAdditional instructions: ${customInstructions}`
     }
 
-    // Call OpenRouter API with better error handling
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+    // Call OpenRouter API with fallback models
+    const models = [
+      'meta-llama/llama-4-maverick:free',
+      'mistralai/mistral-small-3.2-24b-instruct:free',
+      'microsoft/phi-3-mini-128k-instruct:free',
+      "qwen/qwen3-30b-a3b:free",
+      'google/gemma-2-9b-it:free',
+      "deepseek/deepseek-r1-0528:free",
+      "mistralai/devstral-small:free",
+    ]
 
-    try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://socialscribe.pages.dev',
-          'X-Title': 'SocialScribe'
-        },
-        body: JSON.stringify({
-          model: 'meta-llama/llama-4-maverick:free',
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          stream: true,
-          temperature: 0.7,
-          max_tokens: 1000
-        }),
-        signal: controller.signal
-      })
+    let response: Response | null = null
+    let lastError: Error | null = null
 
-      clearTimeout(timeoutId)
+    for (const model of models) {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        console.error('OpenRouter API error:', response.status, errorText)
-        throw new Error(`OpenRouter API error: ${response.status}`)
-      }
-
-      // Return streaming response with better error handling
-      const encoder = new TextEncoder()
-      const decoder = new TextDecoder()
-
-      const stream = new ReadableStream({
-        async start(controller) {
-          if (!response.body) {
-            controller.error(new Error('No response body'))
-            return
-          }
-
-          const reader = response.body.getReader()
-
-          try {
-            while (true) {
-              const { done, value } = await reader.read()
-
-              if (done) {
-                controller.close()
-                break
+      try {
+        response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://socialscribe.pages.dev',
+            'X-Title': 'SocialScribe'
+          },
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              {
+                role: 'user',
+                content: prompt
               }
+            ],
+            stream: true,
+            temperature: 0.7,
+            max_tokens: 1000
+          }),
+          signal: controller.signal
+        })
 
-              const chunk = decoder.decode(value, { stream: true })
-              const lines = chunk.split('\n')
+        clearTimeout(timeoutId)
 
-              for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                  const data = line.slice(6).trim()
+        if (response.ok) {
+          console.log(`Successfully using model: ${model}`)
+          break // Success, exit the loop
+        } else {
+          const errorText = await response.text()
+          console.warn(`Model ${model} failed with status ${response.status}:`, errorText)
+          
+          // If it's a 503 (service unavailable), try the next model
+          if (response.status === 503) {
+            lastError = new Error(`Model ${model} temporarily unavailable (503)`)
+            continue
+          } else {
+            // For other errors, throw immediately
+            throw new Error(`OpenRouter API error: ${response.status} - ${errorText}`)
+          }
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId)
+        console.warn(`Model ${model} failed:`, fetchError)
+        lastError = fetchError instanceof Error ? fetchError : new Error(String(fetchError))
+        
+        // If it's an abort error or 503-related, try next model
+        if (fetchError instanceof Error && 
+            (fetchError.name === 'AbortError' || fetchError.message.includes('503'))) {
+          continue
+        } else {
+          // For other errors, try next model but log the error
+          continue
+        }
+      }
+    }
 
-                  if (data === '[DONE]') {
-                    controller.close()
-                    return
-                  }
+    // If we get here and response is not ok, all models failed
+    if (!response || !response.ok) {
+      console.error('All models failed. Last error:', lastError)
+      throw new Error(`All AI models are currently unavailable. Please try again later. Last error: ${lastError?.message || 'Unknown error'}`)
+    }
 
-                  if (data) {
-                    try {
-                      const parsed = JSON.parse(data)
-                      const content = parsed.choices?.[0]?.delta?.content
+    // Return streaming response with better error handling
+    const encoder = new TextEncoder()
+    const decoder = new TextDecoder()
 
-                      if (content) {
-                        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
-                      }
-                    } catch (e) {
-                      // Skip invalid JSON
-                      console.warn('Failed to parse JSON:', data)
+    const stream = new ReadableStream({
+      async start(controller) {
+        if (!response.body) {
+          controller.error(new Error('No response body'))
+          return
+        }
+
+        const reader = response.body.getReader()
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+
+            if (done) {
+              controller.close()
+              break
+            }
+
+            const chunk = decoder.decode(value, { stream: true })
+            const lines = chunk.split('\n')
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6).trim()
+
+                if (data === '[DONE]') {
+                  controller.close()
+                  return
+                }
+
+                if (data) {
+                  try {
+                    const parsed = JSON.parse(data)
+                    const content = parsed.choices?.[0]?.delta?.content
+
+                    if (content) {
+                      controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content })}\n\n`))
                     }
+                  } catch (e) {
+                    // Skip invalid JSON
+                    console.warn('Failed to parse JSON:', data)
                   }
                 }
               }
             }
-          } catch (error) {
-            console.error('Stream error:', error)
-            controller.error(error)
-          } finally {
-            try {
-              reader.releaseLock()
-            } catch (e) {
-              // Reader might already be released
-            }
           }
-        },
-        cancel() {
-          // Clean up when stream is cancelled
-          controller.abort()
+        } catch (error) {
+          console.error('Stream error:', error)
+          controller.error(error)
+        } finally {
+          try {
+            reader.releaseLock()
+          } catch (e) {
+            // Reader might already be released
+          }
         }
-      })
+      },
+      cancel() {
+        // Clean up when stream is cancelled
+        // Note: controller is not available here, but that's ok
+      }
+    })
 
-      return new Response(stream, {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-          'Access-Control-Max-Age': '86400',
-        },
-      })
-
-    } catch (fetchError) {
-      clearTimeout(timeoutId)
-      throw fetchError
-    }
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+        'Access-Control-Max-Age': '86400',
+      },
+    })
 
   } catch (error) {
     console.error('API Error:', error)
