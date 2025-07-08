@@ -67,7 +67,7 @@ export async function POST(request: Request) {
           'X-Title': 'SocialScribe'
         },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-r1-0528:free',
+          model: 'meta-llama/llama-4-maverick:free',
           messages: [
             {
               role: 'user',

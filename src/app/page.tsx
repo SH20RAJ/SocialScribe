@@ -234,11 +234,15 @@ export default function Home() {
                   Join the waitlist to be the first to try these features:
                 </p>
                 <div className="flex gap-3">
-                  <Button className="bg-gray-900 hover:bg-gray-800 text-white border-0">
-                    Join Waitlist
-                  </Button>
+                    <Button asChild className="bg-gray-900 hover:bg-gray-800 text-white border-0">
+                    <Link href="https://tally.so/r/nPQ0gb">
+                      Join Waitlist
+                    </Link>
+                    </Button>
                   <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50">
-                    Learn More
+                    <Link href="#">
+                      Learn More
+                    </Link>
                   </Button>
                 </div>
               </div>
