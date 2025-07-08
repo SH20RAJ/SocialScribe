@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Brain, Chrome, Download, Sparkles, Zap, Globe, MessageCircle, Mail, FileText, Twitter, Linkedin } from "lucide-react"
 import Link from "next/link"
 import RewriteDemo from "@/components/RewriteDemo"
@@ -160,7 +158,7 @@ export default function Home() {
       </section>
 
       {/* Coming Soon Features */}
-      <section className="py-20 px-6 bg-white">
+      <section id="coming-soon" className="py-20 px-6 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1 rounded-md text-sm mb-6">
@@ -247,15 +245,15 @@ export default function Home() {
             </div>
 
             {/* Visual Preview */}
-            <div className="bg-gray-50 rounded-lg p-6">
-              <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
-                <div className="flex items-center gap-3 pb-3 border-b border-gray-100">
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
                   <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-medium">L</span>
                   </div>
                   <div>
                     <div className="font-medium text-sm">LinkedIn Chat</div>
-                    <div className="text-xs text-gray-500">Sarah Johnson • Online</div>
+                    <div className="text-xs text-gray-500">Sarah Johnson - Online</div>
                   </div>
                 </div>
 
@@ -267,26 +265,26 @@ export default function Home() {
                   </div>
                   
                   <div className="flex justify-start">
-                    <div className="bg-gray-100 px-3 py-2 rounded-lg text-sm max-w-xs">
-                      Thanks! I'd love to discuss it further. Are you free for a quick call this week?
+                    <div className="bg-white px-3 py-2 rounded-lg text-sm max-w-xs border border-gray-200">
+                      Thanks! I would love to discuss it further. Are you free for a quick call this week?
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-100">
+                <div className="pt-4 border-t border-gray-200">
                   <div className="text-xs text-gray-500 mb-2 flex items-center gap-1">
                     <Sparkles className="h-3 w-3" />
                     AI Suggestions
                   </div>
                   <div className="space-y-2">
-                    <button className="w-full text-left p-2 bg-gray-50 hover:bg-gray-100 rounded-md text-sm border border-gray-200 transition-colors">
-                      "Absolutely! I'm available Tuesday or Wednesday afternoon. Which works better for you?"
+                    <button className="w-full text-left p-2 bg-white hover:bg-gray-50 rounded-md text-sm border border-gray-200 transition-colors">
+                      Absolutely! I am available Tuesday or Wednesday afternoon. Which works better for you?
                     </button>
-                    <button className="w-full text-left p-2 bg-gray-50 hover:bg-gray-100 rounded-md text-sm border border-gray-200 transition-colors">
-                      "I'd be happy to chat! Let me check my calendar and get back to you with some options."
+                    <button className="w-full text-left p-2 bg-white hover:bg-gray-50 rounded-md text-sm border border-gray-200 transition-colors">
+                      I would be happy to chat! Let me check my calendar and get back to you with some options.
                     </button>
-                    <button className="w-full text-left p-2 bg-gray-50 hover:bg-gray-100 rounded-md text-sm border border-gray-200 transition-colors">
-                      "Definitely interested! Would a 15-minute call work, or do you prefer a longer discussion?"
+                    <button className="w-full text-left p-2 bg-white hover:bg-gray-50 rounded-md text-sm border border-gray-200 transition-colors">
+                      Definitely interested! Would a 15-minute call work, or do you prefer a longer discussion?
                     </button>
                   </div>
                 </div>
@@ -297,7 +295,7 @@ export default function Home() {
       </section>
 
       {/* Installation Guide */}
-      <section id="install" className="py-20 px-6 bg-gray-50">
+      <section id="install" className="py-20 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4 text-gray-900">Install extension</h2>
@@ -321,7 +319,7 @@ export default function Home() {
             AI-powered writing assistant
           </p>
           <p className="text-xs text-gray-500">
-            Powered by AI â€¢ Made for better writing
+            Powered by AI - Made for better writing
           </p>
         </div>
       </footer>
