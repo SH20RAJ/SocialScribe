@@ -114,6 +114,26 @@ export default function ExtensionInstallGuide() {
         </div>
       </div>
 
+      {/* Video Tutorial */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold mb-4 text-gray-900">Video Tutorial</h3>
+        <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/yNFwFQrc27Q"
+            title="How to Install Chrome Extension from Downloaded File"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            className="w-full h-full"
+          ></iframe>
+        </div>
+        <p className="text-sm text-gray-600 mt-3">
+          Watch this step-by-step guide on how to install a Chrome extension from a downloaded file.
+        </p>
+      </div>
+
       {/* Troubleshooting */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
         <h4 className="font-medium text-gray-900 mb-2">Need help?</h4>
