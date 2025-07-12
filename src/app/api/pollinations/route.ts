@@ -70,82 +70,47 @@ export async function POST(request: Request) {
       prompt += `\n\nAdditional instructions: ${customInstructions}`
     }
 
-    // Try Pollinations AI first (now default behavior)
+    // Try Pollinations AI first if enabled
     if (usePollinationsFirst) {
       try {
-        console.log('Attempting Pollinations AI...')
-        
-        // Add a timeout for Pollinations request
-        const pollinationsController = new AbortController()
-        const timeoutId = setTimeout(() => pollinationsController.abort(), 15000) // 15 second timeout
-        
+        console.log('Trying Pollinations AI first...')
         const pollinationsResponse = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
           method: 'GET',
           headers: {
-            'User-Agent': 'SocialScribe/1.0',
-            'Accept': 'text/plain'
-          },
-          signal: pollinationsController.signal
+            'User-Agent': 'SocialScribe/1.0'
+          }
         })
-
-        clearTimeout(timeoutId)
 
         if (pollinationsResponse.ok) {
           const result = await pollinationsResponse.text()
+          console.log('Pollinations AI successful')
           
-          // Clean up the result - remove any unwanted formatting
-          const cleanResult = result.trim()
-          
-          if (cleanResult && cleanResult.length > 0) {
-            console.log('Pollinations AI successful')
-            
-            // Return as streaming response to match the original API format
-            const encoder = new TextEncoder()
-            const stream = new ReadableStream({
-              start(controller) {
-                // Split the result into chunks for streaming effect
-                const words = cleanResult.split(' ')
-                let currentIndex = 0
-                
-                const sendChunk = () => {
-                  if (currentIndex < words.length) {
-                    const chunk = words.slice(currentIndex, currentIndex + 3).join(' ') + ' '
-                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: chunk, source: 'pollinations' })}\n\n`))
-                    currentIndex += 3
-                    setTimeout(sendChunk, 50) // Small delay for streaming effect
-                  } else {
-                    controller.enqueue(encoder.encode(`data: [DONE]\n\n`))
-                    controller.close()
-                  }
-                }
-                
-                sendChunk()
-              }
-            })
+          // Return as streaming response to match the original API format
+          const encoder = new TextEncoder()
+          const stream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: result, source: 'pollinations' })}\n\n`))
+              controller.enqueue(encoder.encode(`data: [DONE]\n\n`))
+              controller.close()
+            }
+          })
 
-            return new Response(stream, {
-              headers: {
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
-                'Access-Control-Max-Age': '86400',
-              },
-            })
-          } else {
-            console.warn('Pollinations AI returned empty result, falling back to OpenRouter')
-          }
+          return new Response(stream, {
+            headers: {
+              'Content-Type': 'text/event-stream',
+              'Cache-Control': 'no-cache',
+              'Connection': 'keep-alive',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+              'Access-Control-Max-Age': '86400',
+            },
+          })
         } else {
-          console.warn(`Pollinations AI failed with status ${pollinationsResponse.status}, falling back to OpenRouter`)
+          console.warn('Pollinations AI failed, falling back to OpenRouter')
         }
       } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          console.warn('Pollinations AI timeout, falling back to OpenRouter')
-        } else {
-          console.warn('Pollinations AI error, falling back to OpenRouter:', error)
-        }
+        console.warn('Pollinations AI error, falling back to OpenRouter:', error)
       }
     }
 
